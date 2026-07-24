@@ -1,0 +1,27 @@
+# Private athlete data and all derived private documents
+/docs/
+
+# Local/generated working files
+/tmp/
+.DS_Store
+**/.DS_Store
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# GarminDB files
+/.venv/
+/HealthData/
+/DBs/
+/garmindb.log
+/GarminConnectConfig.json
+/garmin_tokens.json
+*.db
+*.sqlite
+*.sqlite3

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Daily Recovery Collector"
+  short_description: "Log and interpret daily recovery metrics"
+  default_prompt: "Use $collect-daily-metrics to record daily recovery data and assess its training implications."

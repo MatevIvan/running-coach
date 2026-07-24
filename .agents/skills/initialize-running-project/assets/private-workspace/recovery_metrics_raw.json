@@ -1,0 +1,7 @@
+{
+  "schema_version": 1,
+  "last_updated": null,
+  "purpose": "Permanent private raw recovery log.",
+  "decision_rule": "For daily training decisions, use only the most recent 7 valid entries unless the user explicitly asks for a longer trend review.",
+  "entries": []
+}

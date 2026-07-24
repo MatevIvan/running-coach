@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "last_updated": "2027-04-05",
+  "purpose": "Synthetic example of the permanent raw recovery log. Real data belongs only in docs/recovery_metrics_raw.json.",
+  "decision_rule": "For daily training decisions, use only the most recent 7 valid entries unless the user explicitly asks for a longer trend review.",
+  "entries": [
+    {
+      "date": "2027-04-03",
+      "sleep_duration": "6h 18min",
+      "sleep_duration_minutes": 378,
+      "sleep_score": 63,
+      "resting_hr_bpm": 54,
+      "hrv": {
+        "value_ms": 55,
+        "status": "unbalanced",
+        "raw": "55 ms, unbalanced"
+      },
+      "training_readiness": {
+        "score": 48,
+        "status": "low",
+        "raw": "48, low"
+      },
+      "body_battery_stress": {
+        "raw": "Body Battery high 70, low 16; stressful day",
+        "body_battery": {
+          "daily_high": 70,
+          "daily_low": 16,
+          "approximate": false
+        },
+        "stress": {
+          "summary": "stressful"
+        }
+      },
+      "soreness_or_pain": "Mild calf tightness, 1/10.",
+      "notes": "Synthetic orange-light day. Remove intensity and reassess after recovery.",
+      "source": "Mock manual entry"
+    },
+    {
+      "date": "2027-04-04",
+      "sleep_duration": "7h 06min",
+      "sleep_duration_minutes": 426,
+      "sleep_score": 74,
+      "resting_hr_bpm": 52,
+      "hrv": {
+        "value_ms": 58,
+        "status": "balanced",
+        "raw": "58 ms, balanced"
+      },
+      "training_readiness": {
+        "score": 62,
+        "status": "moderate",
+        "raw": "62, moderate"
+      },
+      "body_battery_stress": {
+        "raw": "Body Battery high 84, low 21; moderate stress",
+        "body_battery": {
+          "daily_high": 84,
+          "daily_low": 21,
+          "approximate": false
+        },
+        "stress": {
+          "summary": "moderate"
+        }
+      },
+      "soreness_or_pain": "Mild general leg fatigue after a mock 8.1 mi run.",
+      "notes": "Synthetic yellow-light recovery day. Keep the planned rest day.",
+      "source": "Mock manual entry"
+    },
+    {
+      "date": "2027-04-05",
+      "sleep_duration": "7h 42min",
+      "sleep_duration_minutes": 462,
+      "sleep_score": 82,
+      "resting_hr_bpm": 50,
+      "hrv": {
+        "value_ms": 61,
+        "status": "balanced",
+        "raw": "61 ms, balanced"
+      },
+      "training_readiness": {
+        "score": 76,
+        "status": "high",
+        "raw": "76, high"
+      },
+      "body_battery_stress": {
+        "raw": "Body Battery high 91, low 28; low-stress prior day",
+        "body_battery": {
+          "daily_high": 91,
+          "daily_low": 28,
+          "approximate": false
+        },
+        "stress": {
+          "summary": "low"
+        }
+      },
+      "soreness_or_pain": "None.",
+      "notes": "Synthetic green-light day. Normal recovery cluster supports the mock easy run.",
+      "source": "Mock manual entry"
+    }
+  ]
+}

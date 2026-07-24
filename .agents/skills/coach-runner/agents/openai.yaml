@@ -1,0 +1,4 @@
+interface:
+  display_name: "Coach Runner"
+  short_description: "Maintain training plans and coaching context"
+  default_prompt: "Use $coach-runner to answer this coaching question using the current runner profile and plan."

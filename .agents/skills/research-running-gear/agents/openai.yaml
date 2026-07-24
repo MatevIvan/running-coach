@@ -1,0 +1,4 @@
+interface:
+  display_name: "Research Running Gear"
+  short_description: "Compare running products for athlete needs"
+  default_prompt: "Use $research-running-gear to research and compare the best options for this running purchase."

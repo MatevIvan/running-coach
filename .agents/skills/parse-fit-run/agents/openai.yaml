@@ -1,0 +1,4 @@
+interface:
+  display_name: "Parse FIT Run"
+  short_description: "Extract run metrics from FIT files"
+  default_prompt: "Use $parse-fit-run to extract metrics from this running FIT file."
