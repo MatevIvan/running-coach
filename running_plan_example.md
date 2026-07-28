@@ -1,4 +1,4 @@
-# Marathon Plan — Synthetic Example
+# Running Plan — Synthetic Example
 
 > **Example data only.** This schedule is fictional, is not a prescription, and must never be used as the live athlete plan.
 
@@ -8,13 +8,16 @@ Source profile: `runner_profile_example.md` demonstrates the format. A real loca
 
 ## Plan Status
 
-- Mock target race: first marathon on 2027-10-03
-- Current phase: aerobic base and durability
+- Block: eight-week aerobic-consistency and controlled-tempo development
+- Block dates: 2027-04-05 through 2027-05-30
+- Reassessment: 2027-05-31
+- Active race or event: none scheduled
 - Current sustainable volume estimate: 22-27 mi/week
 - Current long-run ceiling: 12.6 mi
-- Primary limiter: long-run history and fueling practice
-- Secondary watch item: mild calf tightness after hill sessions
-- Performance target: intentionally unresolved until more durability and race evidence exist
+- Primary objective: make four-run weeks durable and build toward 27-31 mi/week
+- Secondary objective: improve repeatable controlled-tempo work without compromising easy-day execution
+- Primary limiter: limited history at the target volume
+- Watch item: mild calf tightness after hill sessions
 
 ## This Week's Plan
 
@@ -37,13 +40,33 @@ Operating goal: return to normal frequency after a planned recovery week while k
 | Sat 2027-04-10 | Long run | 11-12 mi | Mostly 138-153 bpm, RPE 3-5 | Practice 30-45 g carbohydrate/hour; stop progression if gait changes |
 | Sun 2027-04-11 | Rest | 0 mi | — | No makeup mileage |
 
+## Block Success and Progression Criteria
+
+The block succeeds if:
+
+- at least six of eight weeks contain four runs without cramming missed mileage;
+- two or more weeks reach 27-31 mi with normal next-day recovery;
+- the athlete completes a controlled 13-14 mi long run;
+- tempo work progresses from 18 to 25-30 total minutes without late-repetition fade;
+- the standard aerobic route shows stable or improved pace/HR under comparable conditions;
+- calf tightness remains mild, transient, and non-progressive.
+
+Progress only when:
+
+- the preceding week was completed with normal mechanics;
+- sleep, fatigue, and symptoms do not show a negative cluster;
+- easy effort remains controlled;
+- the athlete can absorb the current load rather than merely finish it.
+
+Hold or recover when those conditions are not met. The absence of a race is not a reason to avoid progression when they are met.
+
 ## Planning Assumptions
 
 - The mock athlete is healthy enough for normal easy running.
 - Recent recovery metrics are stable.
-- The target race date is confirmed.
 - Four run days fit the mock athlete's schedule.
-- Current training should build durability before marathon-specific pace work.
+- No event-specific work is needed.
+- Current training should develop general fitness, durability, and repeatable threshold support.
 
 ## Training Intensity Rules
 
@@ -72,21 +95,29 @@ Controlled tempo:
 - If two or more signals are poor, remove the workout and consider rest.
 - Do not move missed quality work onto Friday or into the long run.
 
-## Provisional Build
+## Development Horizon
 
 This table demonstrates the expected plan format. It is mock data, not a reusable prescription.
 
 | Week | Target Miles | Long Run | Key Session | Purpose |
 |---|---:|---:|---|---|
-| Apr 5 | 24-27 | 11-12 | Controlled tempo | Resume normal frequency |
-| Apr 12 | 26-29 | 13 | Short hills or tempo | Add modest durability |
-| Apr 19 | 27-30 | 14 | Steady aerobic work | Extend long-run time |
-| Apr 26 | 21-24 | 10 | Strides only | Recovery week |
-| May-Jun | Gradual build | 12-16 | Alternating tempo/hills | General preparation |
-| Jul-Aug | Athlete-dependent | 15-19 | Marathon-specific blocks only if earned | Specific preparation |
-| Sep | Reduced volume | Decreasing | Short controlled work | Taper |
+| Apr 5 | 24-27 | 11-12 | 3 x 6 min tempo | Resume normal frequency |
+| Apr 12 | 26-29 | 12-13 | 3 x 7 min tempo | Add modest volume and repeatability |
+| Apr 19 | 27-30 | 13 | 2 x 10 min tempo | Extend endurance |
+| Apr 26 | 21-24 | 9-10 | Strides only | Recovery and adaptation |
+| May 3 | 27-30 | 12 | 3 x 8 min tempo | Resume load |
+| May 10 | 28-31 | 13-14 | 25 min controlled tempo | Peak block stimulus |
+| May 17 | 27-30 | 11-12 | Aerobic benchmark | Confirm adaptation |
+| May 24 | 22-25 | 9-10 | Strides only | Absorb and reassess |
 
-No week should advance mechanically. Pain, recovery, missed training, or abnormal HR response overrides the table.
+No week advances mechanically. Pain, recovery, missed training, or abnormal HR response overrides the table. Strong recovery does not justify jumping ahead by multiple weeks.
+
+## Benchmark
+
+- Repeat the same flat six-mile aerobic route during the week of 2027-05-17.
+- Keep effort at the established easy target; do not time-trial it.
+- Compare pace, average HR, breathing, late-run drift, conditions, and next-day recovery with prior comparable runs.
+- Use the result as one input at the block review, not a pass/fail test.
 
 ## Workout Menu
 
@@ -98,40 +129,23 @@ Strides:
 Short hills:
 
 - 6-8 x 30-45 seconds at controlled strong effort
-- Avoid when calf or Achilles symptoms are active
+- Avoid while calf or Achilles symptoms are active
 
 Tempo intervals:
 
 - 2-4 repetitions of 5-10 minutes at RPE 6-7
 - Use easy jogging recoveries and preserve even execution
 
-Marathon-specific work:
-
-- Add only after weekly consistency, long-run durability, and fueling are established
-- Use conservative blocks within long runs rather than full-distance race rehearsals
-
 ## Fueling Practice
 
 - Begin on runs longer than about 75 minutes.
 - Mock starting target: 30-45 g carbohydrate per hour.
-- Practice fluids and sodium under conditions similar to the race.
 - Record product, amount, timing, fluid, weather, and gastrointestinal response.
 - Increase only when the current dose is well tolerated.
 
-## Shoe Plan
+## Event-Specific Preparation
 
-- Track mileage for every pair.
-- Introduce any race-day pair well before taper.
-- Do not make a new shoe the solution to unresolved pain without assessing training load and symptoms.
-
-## Injury Watchlist
-
-- Calf tightness that worsens, persists into normal walking, or changes stride
-- Localized bone or tendon pain
-- Symptoms that intensify during a run rather than warming up
-- Repeated asymmetrical pain after hills
-
-Concerning symptoms warrant stopping the run and, when appropriate, evaluation by a qualified clinician.
+None. If the athlete later chooses an event, add it to the runner profile first, then decide whether its date and demands should alter this block. Do not assume that every event requires a full plan rewrite.
 
 ## Strength and Cross-Training
 
@@ -168,7 +182,8 @@ Abnormal HR response:
 
 ## Questions to Resolve
 
-- What race performance is supported after the next training block?
 - Does calf tightness recur on flat routes?
+- Is 27-31 mi/week absorbed with normal recovery?
 - Which fueling products and doses are tolerated?
-- What are the race course, weather, and aid-station details?
+- What should the next block emphasize after the 2027-05-31 reassessment?
+- Has an event become relevant enough to change the plan?

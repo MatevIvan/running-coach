@@ -11,7 +11,7 @@ Produce a current, evidence-backed buying recommendation tied to the athlete's u
 
 ## Establish the Use Case
 
-Read `docs/runner_profile.md` and `docs/marathon_plan.md` only when athlete-specific fit, current equipment, injury history, race needs, climate, or training volume matters.
+Read `docs/runner_profile.md` and `docs/running_plan.md` only when athlete-specific fit, current equipment, injury history, development or event needs, climate, or training volume matters.
 
 When recent training volume, long-run distance, terrain, climate exposure, or activity history would materially affect the recommendation:
 
@@ -25,7 +25,7 @@ Identify:
 - intended use and required features;
 - budget and location/market;
 - sizing, fit, compatibility, and current equipment;
-- training or race timeline;
+- training-block or event timeline;
 - deal-breakers and acceptable tradeoffs.
 
 Ask a concise question only when a missing answer would materially change the recommendation. Otherwise state reasonable assumptions.
@@ -49,7 +49,7 @@ For shoes, consider fit, intended pace and distance, surface, stability needs, g
 
 For electronics, consider sensor quality, compatibility, battery life, data access, comfort, platform lock-in, and whether the added metric will change decisions.
 
-For hydration and fueling gear, consider capacity, carry comfort, race rules, refill strategy, carbohydrate/sodium delivery, gastrointestinal tolerance, and practice time.
+For hydration and fueling gear, consider capacity, carry comfort, event rules when applicable, refill strategy, carbohydrate/sodium delivery, gastrointestinal tolerance, and practice time.
 
 Account for the cost of an unnecessary or poorly timed purchase. Do not recommend premium equipment merely because it is newer.
 

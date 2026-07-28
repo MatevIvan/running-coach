@@ -6,6 +6,10 @@ _Private live athlete record. Onboarding has not been completed._
 
 No athlete baseline has been recorded.
 
+## Goals and Event Context
+
+No development goals have been recorded. No race or event is assumed.
+
 ## Data Sources and Quality
 
 No activity or recovery source has been processed.
@@ -26,9 +30,9 @@ No durable training assessment has been established.
 
 Unknown. Do not prescribe zones until sufficient evidence is available.
 
-## Active Marathon Plan
+## Active Running Plan
 
-See `docs/marathon_plan.md`.
+See `docs/running_plan.md`.
 
 ## Future Chats Should Know
 

@@ -38,6 +38,22 @@ python3 -m venv .venv
 .venv/bin/garmindb_cli.py --version
 ```
 
+Inspect the installed authentication dependency:
+
+```bash
+.venv/bin/python -c "import importlib.metadata as m; print('GarminDb', m.version('GarminDb')); print('garminconnect', m.version('garminconnect'))"
+```
+
+GarminDB 3.8.0 installs `garminconnect==0.3.3`. That authentication version failed on a stale-token/social-profile path in project testing. `garminconnect` 0.3.5 added token-store security and login-recovery fixes, and the current GarminDB source accepts `garminconnect>=0.3.3`.
+
+When the released GarminDB package still installs a `garminconnect` version older than 0.3.5, apply this temporary tested override:
+
+```bash
+.venv/bin/python -m pip install --upgrade "garminconnect==0.3.5"
+```
+
+GarminDB 3.8.0's published metadata will cause `pip check` to report its old exact `==0.3.3` requirement even though the 0.3.5 API passed the project's import and live incremental-sync tests. Treat the override as provisional: verify a real guarded sync before keeping it, roll back with `.venv/bin/python -m pip install "garminconnect==0.3.3"` if compatibility fails, and remove this workaround when a released GarminDB version officially allows the fixed dependency. Check current upstream release notes rather than assuming these version numbers remain current.
+
 On Windows, use the equivalent executables under `.venv\Scripts\`.
 
 Preserve an existing `.venv`. Inspect it before installing and do not delete or rebuild it without explicit approval. Installing packages and downloading Garmin data require network access.

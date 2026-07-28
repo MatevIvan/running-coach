@@ -1,6 +1,6 @@
 ---
 name: collect-daily-metrics
-description: Collect, validate, store, and interpret daily GarminDB, Garmin, or self-reported recovery metrics. Use when the user provides or requests sleep duration or score, resting heart rate, HRV value/status/baseline, training readiness, Body Battery, stress, soreness, pain, illness, fatigue, nutrition, or daily recovery screenshots; asks whether to train today; or requests an update to the private recovery log.
+description: Collect, validate, store, and interpret daily GarminDB, Garmin, or self-reported recovery metrics, including automatic prior-day sleep reconciliation and Body Battery retrieval when GarminDB is connected. Use when the user provides or requests sleep duration or score, resting heart rate, HRV value/status/baseline, training readiness, Body Battery, stress, soreness, pain, illness, fatigue, nutrition, or daily recovery screenshots; asks whether to train today; or requests an update to the private recovery log.
 ---
 
 # Collect Daily Metrics
@@ -15,7 +15,7 @@ Read:
 
 - `docs/recovery_metrics_raw.json`
 - `docs/recovery_metrics.md`
-- `docs/marathon_plan.md`
+- `docs/running_plan.md`
 - `docs/runner_profile.md` only when baseline, symptoms, or a durable trend matters
 
 Never use root example files as live data.
@@ -24,29 +24,47 @@ Never use root example files as live data.
 
 Complete this sequence before interpreting recovery or updating files:
 
-1. Resolve and state the morning metric date as `YYYY-MM-DD`. Keep prior-day Body Battery, stress, activity, or nutrition context attached to its actual date.
-2. Check for `docs/garmindb/data/DBs/garmin.db` and, when needed, `garmin_monitoring.db` and `garmin_summary.db`.
-3. Query the target date read-only:
+1. Resolve and state the current morning metric date as `YYYY-MM-DD`, then calculate the prior calendar date. Current-morning sleep means the sleep session ending that morning.
+2. Treat the user's Garmin/watch entry or screenshot as the normal source for the current morning because GarminDB's standard `--latest` download ends on the prior date.
+3. When GarminDB is connected, run the guarded recovery sync before reading either date:
+
+   ```bash
+   python3 .agents/skills/collect-daily-metrics/scripts/sync_latest_garmindb_recovery.py \
+     --project-root . --date PRIOR-YYYY-MM-DD --json
+   ```
+
+   The wrapper owns the GarminDB working directory, recovery-only command flags, shared sync lock, private output capture, and database/coverage verification. Do not reconstruct or bypass its underlying command.
+
+   - For `status: success`, continue even when `coverage_complete` is false; report the named missing sources.
+   - For `status: failed`, report its category and use existing data only when exact-date coverage can still be verified.
+   - For `status: busy`, wait for the existing GarminDB sync.
+   - For `status: not_connected`, continue from user-supplied metrics and state that prior-day verification and Body Battery retrieval are unavailable.
+4. Query the prior date read-only:
 
    ```bash
    python3 .agents/skills/collect-daily-metrics/scripts/read_garmindb_daily.py \
-     --project-root . --date YYYY-MM-DD
+     --project-root . --date PRIOR-YYYY-MM-DD
    ```
 
    For a trend review, use `--start-date YYYY-MM-DD --end-date YYYY-MM-DD`. Check each source independently, including `sleep`, `resting_hr`, `hrv`, `daily_summary`, and relevant monitoring or summary rows. Do not assume one present row means the day is complete.
-4. Extract available objective values with source and date provenance. Do not ask the user to transcribe metrics already present in GarminDB.
-5. If the date is absent or the database is stale, say which metrics are unavailable and offer an incremental GarminDB sync before requesting manual values.
-6. After objective extraction, ask one concise, dated question covering missing qualitative inputs. At minimum ask: “For `YYYY-MM-DD`, is there any pain or soreness this morning?” Also ask about illness symptoms, unusual fatigue, sleep disruption, or other context only when not already supplied and material to the decision.
-7. Wait for the answer before interpreting readiness or writing durable files. Skip the wait only for an explicitly requested data-only extraction or when the user already supplied the needed qualitative context.
+5. Reconcile the prior date before analyzing the current morning:
+   - confirm its sleep duration and score against the existing prior-date raw entry;
+   - merge GarminDB sleep stages, resting HR, overnight/rolling HRV, and source provenance when available;
+   - retrieve `bb_max`, `bb_min`, `bb_charged`, stress, steps, and activity time from the prior-date `daily_summary`;
+   - keep every prior-day value attached to the prior date, not the current morning;
+   - report material conflicts and prefer the more direct objective source without discarding qualitative context.
+6. Extract the current morning values supplied by the user. Do not ask the user to repeat prior-date fields already available in GarminDB. Mark current-day wearable fields unavailable when they were neither supplied nor supported by an exact-date source.
+7. After objective extraction, ask one concise, current-date question covering missing qualitative inputs. At minimum ask: “For `YYYY-MM-DD`, is there any pain or soreness this morning?” Also ask about illness symptoms, unusual fatigue, sleep disruption, or other context only when not already supplied and material to the decision.
+8. Wait for the answer before interpreting readiness or writing durable files. Skip the wait only for an explicitly requested data-only extraction or when the user already supplied the needed context.
 
 GarminDB may not contain training readiness or every wearable field. Mark those values unavailable unless another supplied source supports them.
 
 ## Workflow
 
-1. Identify the metric date. Distinguish the morning measurement date from the prior day's Body Battery, stress, or activity context.
-2. Merge values supported by GarminDB with the user's text or image. Preserve source provenance, uncertainty, approximate values, and missing fields; never let a lower-quality source silently overwrite a better one.
-3. Check the existing raw entry for that date.
-4. Update `docs/recovery_metrics_raw.json` first:
+1. Identify the current metric date and prior date.
+2. Merge the newly synced GarminDB evidence into the existing prior-date entry first. Confirm prior sleep and add prior-day Body Battery/stress without moving either into the current-date entry.
+3. Merge the current morning's user-supplied text or image into the current-date entry. Preserve source provenance, uncertainty, approximate values, and missing fields; never let a lower-quality source silently overwrite a better one.
+4. Update `docs/recovery_metrics_raw.json`:
    - merge a resubmitted date instead of duplicating it;
    - preserve valid fields not replaced by newer evidence;
    - keep all older entries;
@@ -56,7 +74,7 @@ GarminDB may not contain training readiness or every wearable field. Mark those 
    - keep no more than 14 daily rows;
    - summarize the day's recovery cluster and training implication compactly.
 6. Use only the most recent 7 valid daily entries for the immediate decision unless the user asks for a longer review.
-7. Update `docs/marathon_plan.md` only if the new recovery evidence materially changes the remaining week, next session, mileage cap, long run, or symptom handling.
+7. Update `docs/running_plan.md` only if the new recovery evidence materially changes the remaining week, next session, mileage cap, long run, quality session, or symptom handling.
 8. Update `docs/runner_profile.md` only when a repeated or longer-term pattern materially changes the athlete model or risk assessment.
 
 ## Interpretation

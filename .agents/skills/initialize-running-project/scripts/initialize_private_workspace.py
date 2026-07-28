@@ -20,10 +20,12 @@ PRIVATE_DIRS = (
 
 TEMPLATE_FILES = (
     "runner_profile.md",
-    "marathon_plan.md",
+    "running_plan.md",
     "recovery_metrics_raw.json",
     "recovery_metrics.md",
 )
+
+LEGACY_PLAN_NAME = "marathon_plan.md"
 
 
 def parse_args() -> argparse.Namespace:
@@ -131,8 +133,30 @@ def main() -> int:
             directory.mkdir(parents=True, exist_ok=False)
             set_private_mode(directory, 0o700)
 
+    legacy_plan = docs / LEGACY_PLAN_NAME
+    running_plan = docs / "running_plan.md"
+    legacy_plan_supplies_running_plan = legacy_plan.is_file() and not running_plan.exists()
+    if legacy_plan_supplies_running_plan:
+        print(
+            f"{'WOULD MIGRATE' if args.dry_run else 'MIGRATE'} legacy file "
+            f"{legacy_plan.relative_to(root)} to {running_plan.relative_to(root)}"
+        )
+        if not args.dry_run:
+            shutil.copyfile(legacy_plan, running_plan)
+            set_private_mode(running_plan, 0o600)
+        print(
+            f"PRESERVE legacy file {legacy_plan.relative_to(root)}; "
+            "remove it only after verifying the migrated running plan"
+        )
+
     for name in TEMPLATE_FILES:
         destination = docs / name
+        if (
+            args.dry_run
+            and name == "running_plan.md"
+            and legacy_plan_supplies_running_plan
+        ):
+            continue
         if destination.exists():
             if not destination.is_file():
                 print(

@@ -33,7 +33,7 @@ If the current working directory is not the project root, use the absolute path 
 4. Use record-derived distance, duration, pace, average HR, max HR, cadence, power, HR-zone distribution, splits, and first-half/second-half comparison.
 5. Treat `session` and `lap` values as supporting data. If a session field is missing or suspicious, rely on record-derived values.
 6. Report missing streams, implausible values, and likely GPS, HR, cadence, or pause artifacts.
-7. Return the parsed record to the calling workflow. Do not update the runner profile or marathon plan from this parser alone.
+7. Return the parsed record to the calling workflow. Do not update the runner profile or running plan from this parser alone.
 
 The calling analysis skill owns the dated qualitative-question gate. This low-level parser returns objective data only and must not infer pain, effort, weather, session purpose, or physiological meaning.
 

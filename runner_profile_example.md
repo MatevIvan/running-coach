@@ -6,7 +6,7 @@ Last updated: 2027-04-05
 
 Data sources: mock Strava export, three mock FIT activities, and synthetic recovery entries.
 
-Active schedule: `marathon_plan_example.md` demonstrates the public format. A real local project uses the ignored private file `docs/marathon_plan.md`.
+Active schedule: `running_plan_example.md` demonstrates the public format. A real local project uses the ignored private file `docs/running_plan.md`.
 
 ## Athlete Baseline
 
@@ -18,13 +18,20 @@ Active schedule: `marathon_plan_example.md` demonstrates the public format. A re
 - Max heart rate: 190 bpm, device estimate
 - VO2 max: 47, device estimate
 - Typical sleep: about 7 hr 30 min, recent sleep score about 78
-- Target race: first marathon on 2027-10-03
-- Goal hierarchy: finish healthy first; performance target remains open
 - Preferred run days: Monday, Wednesday, Friday, and Saturday
 - Heart-rate source: wrist optical sensor
 - Current shoes: one daily trainer with about 180 known miles
 - Injury history: no diagnosed injury; occasional mild calf tightness after hills
-- Fueling status: water used on long runs; carbohydrate practice has just started
+- Fueling status: water used on longer runs; carbohydrate practice has just started
+
+## Goals and Event Context
+
+- Primary development goal: become a stronger, more consistent all-around runner.
+- Current block objective: make four-run weeks routine, build sustainable volume from 22-27 to 27-31 mi/week, and improve controlled-tempo durability.
+- Success definition: complete at least six of the next eight weeks at the planned frequency, tolerate a 13-14 mi long run, and show stable or improved pace/HR on the standard aerobic benchmark.
+- Next reassessment: 2027-05-31.
+- Active race or event: none scheduled.
+- Event priority: not applicable. Do not invent a race or force event-specific training.
 
 ## Data Processed
 
@@ -42,7 +49,7 @@ Missing or limited data:
 - No chest-strap HR data
 - Incomplete weather and terrain metadata
 - Only three weeks of recovery metrics
-- No validated marathon-pace estimate
+- No validated threshold-pace estimate
 
 Reliable enough for planning:
 
@@ -54,7 +61,7 @@ Reliable enough for planning:
 Do not overinterpret:
 
 - Single max-HR spikes
-- Device VO2 max as marathon readiness
+- Device VO2 max as proof of performance
 - Wrist-HR zone percentages from one run
 - Pace from hot, hilly, or trail sessions
 
@@ -78,41 +85,34 @@ Recent completed weeks:
 | 2027-03-22 | 4 | 26.3 | 12.6 | 148 | Highest durable week so far |
 | 2027-03-29 | 3 | 18.6 | 8.1 | 143 | Planned recovery week |
 
+Comparable aerobic runs:
+
+- 6.0 mi on 2027-03-10 at 10:22/mi, average HR 145
+- 6.1 mi on 2027-03-24 at 10:16/mi, average HR 144
+- 6.0 mi on 2027-04-02 at 10:14/mi, average HR 143
+
 Long-run history:
 
 - 12.6 mi on 2027-03-27 at 10:18/mi, average HR 149
 - 11.0 mi on 2027-03-20 at 10:11/mi, average HR 147
 - 9.0 mi on 2027-03-13 at 10:24/mi, average HR 145
 
-Pace and heart-rate patterns:
-
-- Easy runs usually fall between 10:00 and 11:10/mi at 135-150 bpm.
-- On cool, flat routes, pace is stable with less than 5% first-half/second-half drift.
-- Hill sessions raise average HR substantially, so pace comparisons across terrain are not valid.
-- Two recent easy runs started too quickly and required a deliberate slowdown after mile 2.
-
-Cadence and terrain notes:
-
-- Recorded cadence is usually 166-174 spm on easy paved runs.
-- No cadence target is prescribed; relaxed form and effort control take priority.
-- Most volume is on paved rolling routes. Trail runs are treated as effort-based sessions.
-
 ## Estimates and Open Inputs
 
 Estimates inferred from the mock data:
 
 - Sustainable current volume is about 22-27 mi/week.
-- Aerobic development is adequate for the current phase.
-- Endurance durability is improving but not yet marathon-specific.
-- A conservative build can continue if calf symptoms remain mild and transient.
+- Aerobic development is adequate for a modest volume progression.
+- Endurance durability and controlled-tempo experience are improving but still limited.
+- A progressive block can continue if calf symptoms remain mild and transient.
 
 Unknowns that could materially change the plan:
 
-- A recent race result or threshold field test
 - Whether calf tightness occurs outside hill sessions
-- Exact race course and elevation profile
+- Response to two consecutive 28+ mi weeks
 - Sweat rate and sodium needs
-- Response to 30-45 g carbohydrate per hour on longer runs
+- Response to 30-45 g carbohydrate per hour on runs longer than 90 minutes
+- Whether the athlete chooses an event during this block
 
 ## Runner Profile
 
@@ -120,18 +120,18 @@ Current volume and consistency:
 
 - Four-run weeks are becoming routine.
 - The recent recovery week was planned, not a loss of consistency.
-- Mileage should build from the current 22-27 mi/week range, not from a hypothetical peak.
+- Mileage should build from the demonstrated 22-27 mi/week range, not from a hypothetical peak.
 
 Aerobic base:
 
-- Easy HR is generally stable on comparable routes.
+- Easy HR is stable on comparable routes.
 - The athlete can run 10-12 miles without a major late-run pace collapse.
-- More months of steady volume are needed before marathon-specific conclusions are justified.
+- Continued easy volume should remain the foundation of the block.
 
-Speed capacity:
+Speed and threshold capacity:
 
 - Short controlled tempo work is tolerated.
-- Speed is not the current limiter and does not justify aggressive interval volume.
+- Speed is not the main limiter, but repeatable sub-threshold work is underdeveloped.
 
 Endurance durability:
 
@@ -149,21 +149,30 @@ Recovery capacity:
 - One low-readiness day after the 12.6-mile run resolved with a rest day.
 - Calf symptoms need trend monitoring before adding hill volume.
 
-Marathon-specific readiness:
+## Readiness
 
-- Not currently ready to race 26.2 miles.
-- The October race timeline is reasonable if consistency continues and long-run durability grows.
-- No marathon-time prediction is defensible yet.
+General training readiness:
+
+- Ready for a progressive eight-week block.
+- Not ready for simultaneous large increases in both volume and intensity.
+
+Current-goal readiness:
+
+- Close to making four-run weeks durable.
+- Needs repeated 27-31 mi weeks before the higher volume is considered established.
+- Needs three to five well-controlled tempo sessions before changing threshold estimates.
+
+## Strengths, Limiters, and Risks
 
 Biggest strengths:
 
 - Improving consistency
 - Controlled aerobic response on flat routes
-- Sensible recovery-week response
+- Sensible response to recovery weeks
 
-Biggest weaknesses:
+Primary limiters:
 
-- Limited long-run history
+- Limited history above 27 mi/week
 - Early-run pacing is sometimes too aggressive
 - Fueling practice is new
 
@@ -171,8 +180,8 @@ Main risks:
 
 - Building mileage faster than connective-tissue durability
 - Adding too many hills while calf tightness remains active
-- Treating device fitness estimates as race proof
-- Delaying fueling practice until peak long runs
+- Treating device fitness estimates as proof
+- Letting the absence of a race turn the plan into maintenance without progression
 
 ## Training Zones and Pacing
 
@@ -183,21 +192,22 @@ These mock ranges are conservative estimates, not universal recommendations:
 | Recovery | Conversational, RPE 2-3 | Usually slower than 10:40/mi |
 | Easy | Mostly 135-150 bpm, RPE 3-4 | Often 10:00-11:10/mi |
 | Long | Mostly 138-153 bpm, RPE 3-5 | Effort first; walk steep hills if needed |
-| Tempo | Controlled hard, RPE 6-7 | Set from current workout evidence, not VO2 max |
+| Tempo | Controlled hard, RPE 6-7 | Set from repeated workout evidence, not VO2 max |
 
-Metrics to watch: breathing, average HR, late-run drift, pain, and next-day recovery.
+Metrics to watch: frequency, weekly volume, breathing, average HR, late-run drift, pain, and next-day recovery.
 
-Metrics to mostly ignore: isolated max-HR spikes, instantaneous pace, and a single device race prediction.
+Metrics to mostly ignore: isolated max-HR spikes, instantaneous pace, and a single device prediction.
 
-## Active Marathon Plan
+## Active Running Plan
 
-The real private project points to `docs/marathon_plan.md`. The public mock companion is `marathon_plan_example.md`.
+The real private project points to `docs/running_plan.md`. The public synthetic companion is `running_plan_example.md`.
 
 ## Future Chats Should Know
 
 - This entire file is synthetic and must not be used as real athlete input.
 - The mock athlete is consistently running about 22-27 mi/week with a 12.6-mile long-run ceiling.
-- Durability and fueling practice are the current limiters; speed is not.
+- The active objective is a progressive eight-week development block; no event is scheduled.
+- Frequency, modest volume growth, and controlled-tempo durability are the current priorities.
 - Easy work is effort-led, typically 135-150 bpm in the mock dataset.
 - Monitor hill-related calf tightness and early-run pacing.
-- Use the active private plan in `docs/marathon_plan.md` for a real athlete.
+- Use the active private plan in `docs/running_plan.md` for a real athlete.
