@@ -26,7 +26,7 @@ Complete this sequence before interpreting recovery or updating files:
 
 1. Resolve and state the current morning metric date as `YYYY-MM-DD`, then calculate the prior calendar date. Current-morning sleep means the sleep session ending that morning.
 2. Treat the user's Garmin/watch entry or screenshot as the normal source for the current morning because GarminDB's standard `--latest` download ends on the prior date.
-3. When GarminDB is connected, run the guarded recovery sync before reading either date:
+3. When GarminDB is connected, run the guarded recovery sync before reading either date. This is a network operation: request or enable network access on the first attempt. In a sandboxed Codex shell, use `sandbox_permissions: require_escalated` with a narrow approval for this script; do not first run the sync in a network-blocked sandbox as a probe.
 
    ```bash
    python3 .agents/skills/collect-daily-metrics/scripts/sync_latest_garmindb_recovery.py \
@@ -35,10 +35,12 @@ Complete this sequence before interpreting recovery or updating files:
 
    The wrapper owns the GarminDB working directory, recovery-only command flags, shared sync lock, private output capture, and database/coverage verification. Do not reconstruct or bypass its underlying command.
 
-   - For `status: success`, continue even when `coverage_complete` is false; report the named missing sources.
-   - For `status: failed`, report its category and use existing data only when exact-date coverage can still be verified.
+   - Accept `status: success` only when `sync_completed` and `database_verified` are both `true`. Continue when `coverage_complete` is false, but report the named missing sources.
+   - For `status: failed` with category `network`, retry once immediately with network access if the first execution did not have it. Do not interpret stale coverage until that retry finishes.
+   - For any other `status: failed`, report its category and use existing data only when exact-date coverage can still be verified.
    - For `status: busy`, wait for the existing GarminDB sync.
    - For `status: not_connected`, continue from user-supplied metrics and state that prior-day verification and Body Battery retrieval are unavailable.
+   - Never describe the database as merely stale when the sync failed. Report the failed pull separately from the latest locally available date.
 4. Query the prior date read-only:
 
    ```bash

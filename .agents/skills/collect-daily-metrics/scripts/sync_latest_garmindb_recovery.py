@@ -17,6 +17,13 @@ from typing import Any, Iterator
 
 REQUIRED_STATS = ("monitoring", "sleep", "rhr", "hrv")
 REQUIRED_COVERAGE = ("sleep", "resting_hr", "hrv", "daily_summary")
+TERMINAL_FAILURE_MARKERS = (
+    "all login strategies exhausted",
+    "error:root:login failed",
+    "failed to login!",
+    "interactive mfa",
+    "mfa required",
+)
 
 
 def parse_iso_date(value: str) -> dt.date:
@@ -83,21 +90,6 @@ def classify_failure(output: str) -> tuple[str, str]:
     if any(
         term in lowered
         for term in (
-            "failed to login",
-            "login failed",
-            "authentication",
-            "unauthorized",
-            "retrieve social profile",
-            "401",
-        )
-    ):
-        return (
-            "authentication",
-            "GarminDB could not authenticate with Garmin Connect; prior-day recovery was not refreshed.",
-        )
-    if any(
-        term in lowered
-        for term in (
             "name or service not known",
             "network is unreachable",
             "connection refused",
@@ -111,6 +103,21 @@ def classify_failure(output: str) -> tuple[str, str]:
             "network",
             "GarminDB could not reach Garmin Connect; prior-day recovery was not refreshed.",
         )
+    if any(
+        term in lowered
+        for term in (
+            "failed to login",
+            "login failed",
+            "authentication",
+            "unauthorized",
+            "retrieve social profile",
+            "401",
+        )
+    ):
+        return (
+            "authentication",
+            "GarminDB could not authenticate with Garmin Connect; prior-day recovery was not refreshed.",
+        )
     if "database is locked" in lowered:
         return (
             "database_locked",
@@ -120,6 +127,27 @@ def classify_failure(output: str) -> tuple[str, str]:
         "garmindb",
         "GarminDB returned an error; prior-day recovery was not refreshed.",
     )
+
+
+def log_size(log_path: Path) -> int:
+    try:
+        return log_path.stat().st_size
+    except OSError:
+        return 0
+
+
+def read_log_delta(log_path: Path, starting_size: int) -> str:
+    try:
+        content = log_path.read_bytes()
+    except OSError:
+        return ""
+    offset = starting_size if len(content) >= starting_size else 0
+    return content[offset:].decode("utf-8", errors="replace")
+
+
+def has_terminal_failure(output: str) -> bool:
+    lowered = output.lower()
+    return any(marker in lowered for marker in TERMINAL_FAILURE_MARKERS)
 
 
 @contextmanager
@@ -335,9 +363,9 @@ def main() -> int:
         "--analyze",
         "--latest",
     ]
-
     try:
         with sync_lock(working_dir / ".garmindb_sync.lock"):
+            starting_log_size = log_size(log_path)
             completed = subprocess.run(
                 command,
                 cwd=working_dir,
@@ -359,8 +387,16 @@ def main() -> int:
         )
 
     private_log = relative_path(log_path, root)
-    if completed.returncode != 0:
-        category, message = classify_failure(completed.stdout or "")
+    diagnostics = "\n".join(
+        part
+        for part in (
+            completed.stdout or "",
+            read_log_delta(log_path, starting_log_size),
+        )
+        if part
+    )
+    if completed.returncode != 0 or has_terminal_failure(diagnostics):
+        category, message = classify_failure(diagnostics)
         return fail(
             "failed",
             category,
