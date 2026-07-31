@@ -82,6 +82,8 @@ def list_runs(
                 a.avg_hr,
                 a.max_hr,
                 a.sub_sport,
+                a.self_eval_feel,
+                a.self_eval_effort,
                 a.laps AS summary_laps,
                 (SELECT COUNT(*) FROM activity_laps l WHERE l.activity_id = a.activity_id) AS lap_rows,
                 (SELECT COUNT(*) FROM activity_records r WHERE r.activity_id = a.activity_id) AS record_rows,
@@ -112,6 +114,10 @@ def list_runs(
                 "avg_hr": row["avg_hr"],
                 "max_hr": row["max_hr"],
                 "sub_sport": row["sub_sport"],
+                "self_evaluation": {
+                    "feel": row["self_eval_feel"],
+                    "effort": row["self_eval_effort"],
+                },
                 "detail_coverage": {
                     "summary_laps": row["summary_laps"],
                     "lap_rows": row["lap_rows"],
@@ -132,6 +138,7 @@ def print_text(runs: list[dict[str, object]]) -> None:
         print(
             f"{run['activity_id']} | {run['start_time']} | {run['name']} | "
             f"{run['distance']} {run['distance_units']} | {run['elapsed_time']} | "
+            f"saved feel/effort: {run['self_evaluation']} | "
             f"detail: {run['detail_coverage']} | FIT: {run['fit_file'] or 'not found'}"
         )
 

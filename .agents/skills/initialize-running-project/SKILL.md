@@ -1,6 +1,6 @@
 ---
 name: initialize-running-project
-description: Initialize a fresh clone of the privacy-first running-coach repository by creating its ignored private workspace, collecting athlete onboarding information, seeding the live runner profile and marathon plan, explaining recommended chat workflows, and optionally installing, configuring, and running GarminDB. Use when a user asks to initialize, onboard, set up, bootstrap, or connect Garmin data for a new copy of this project.
+description: Initialize a fresh clone of the privacy-first running-coach repository by creating its ignored private workspace, collecting athlete onboarding information, seeding the live runner profile and running plan, explaining recommended chat workflows, and optionally installing, configuring, and running GarminDB. Use when a user asks to initialize, onboard, set up, bootstrap, or connect Garmin data for a new copy of this project.
 ---
 
 # Initialize Running Project
@@ -52,7 +52,7 @@ The script copies blank structural templates from `assets/private-workspace/`, c
 Verify that these live paths exist:
 
 - `docs/runner_profile.md`
-- `docs/marathon_plan.md`
+- `docs/running_plan.md`
 - `docs/recovery_metrics_raw.json`
 - `docs/recovery_metrics.md`
 - `docs/activities/`
@@ -68,9 +68,10 @@ Ask only questions that materially improve the initial athlete model. Accept “
 
 First collect the minimum baseline:
 
-- primary goal, target race or event, race date, distance, and finish-versus-time priority;
+- primary running goals and what meaningful growth would look like over the next few months;
+- any confirmed or likely race/event, including date, distance, course context, and finish-versus-performance priority; explicitly record `none` when no event is planned;
 - recent weekly running volume and frequency;
-- longest recent run and any recent race or benchmark;
+- longest recent run and any useful recent race, time trial, workout, or benchmark;
 - running history and current consistency;
 - current pain, recurring symptoms, major prior running injuries, or relevant clinician-imposed limits;
 - preferred units and timezone.
@@ -86,7 +87,7 @@ Then collect operating constraints:
 - watch, HR strap, foot pod, power meter, and available Garmin/Strava history;
 - fueling experience and equipment constraints relevant to the goal.
 
-Update the profile again. Create a provisional `docs/marathon_plan.md` only when the goal date and schedule are sufficient. Mark unresolved items explicitly; do not invent zones, mileage history, or race evidence.
+Update the profile again. Create a provisional `docs/running_plan.md` when the baseline and schedule are sufficient. Do not require a race date: without an event, create a 4-12 week development block with a named objective and review date; with a confirmed event, add the appropriate event-specific horizon. Mark unresolved items explicitly; do not invent zones, mileage history, benchmark evidence, or races.
 
 If substantial historical data will be imported, keep the first plan conservative and provisional until that data has been reviewed.
 
@@ -100,9 +101,9 @@ Do not ask the user to paste a Garmin password, MFA code, token, or configuratio
 
 Give the user a compact orientation after setup:
 
-- **Coach chat:** General coaching, weekly reviews, plan changes, race strategy, missed sessions, symptoms affecting future training, and “what should I do next?” Use `coach-runner`.
+- **Coach chat:** General coaching, weekly reviews, development blocks, plan changes, missed sessions, symptoms affecting future training, race preparation when applicable, and “what should I do next?” Use `coach-runner`.
 - **Run-analysis chat:** Review a completed run from a FIT/GPX file, screenshot, or written metrics. Include purpose, RPE, pain/soreness, weather, terrain, and fueling. Use `analyze-running-activity`.
-- **Daily-metrics chat:** Record sleep, resting HR, HRV, readiness, Body Battery/stress, fatigue, illness, soreness, and pain. This is optional when no daily decision is needed, but useful during heavy training, poor recovery, or symptom monitoring. Use `collect-daily-metrics`.
+- **Daily-metrics chat:** Manually provide the current morning's sleep and wearable metrics plus fatigue, illness, soreness, and pain. When GarminDB is connected, `collect-daily-metrics` automatically syncs through the prior day, confirms the prior day's sleep, and adds its finalized Body Battery/stress data before interpreting the current morning. This is optional when no daily decision is needed, but useful during heavy training, poor recovery, or symptom monitoring.
 - **Setup/data chat:** Maintain GarminDB, imports, SQLite queries, privacy checks, and integration failures. Reuse the initialization chat or create a dedicated maintenance chat.
 - **Gear-research chat:** Use `research-running-gear` for purchases that need current product research.
 
