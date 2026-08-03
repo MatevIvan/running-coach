@@ -74,12 +74,59 @@ def database_is_healthy(db_path: Path) -> bool:
     return bool(result and result[0] == "ok")
 
 
+def log_size(log_path: Path) -> int:
+    try:
+        return log_path.stat().st_size
+    except OSError:
+        return 0
+
+
+def read_log_delta(log_path: Path, start: int) -> str:
+    try:
+        with log_path.open("rb") as handle:
+            if handle.seek(0, os.SEEK_END) < start:
+                start = 0
+            handle.seek(start)
+            return handle.read().decode("utf-8", errors="replace")
+    except OSError:
+        return ""
+
+
+def has_terminal_failure(output: str) -> bool:
+    lowered = output.lower()
+    return any(
+        term in lowered
+        for term in (
+            "failed to login!",
+            "all login strategies exhausted",
+            "error:root:login failed",
+        )
+    )
+
+
 def classify_failure(output: str) -> tuple[str, str]:
     lowered = output.lower()
     if any(term in lowered for term in ("mfa", "multi-factor", "two-factor")):
         return (
             "mfa",
             "Garmin authentication requires an interactive MFA step; no fresh data was imported.",
+        )
+    if any(
+        term in lowered
+        for term in (
+            "name or service not known",
+            "name resolution",
+            "network is unreachable",
+            "connection refused",
+            "connection reset",
+            "could not resolve",
+            "timed out",
+            "timeout",
+        )
+    ):
+        return (
+            "network",
+            "GarminDB could not reach Garmin Connect; no fresh data was imported.",
         )
     if any(
         term in lowered
@@ -95,22 +142,6 @@ def classify_failure(output: str) -> tuple[str, str]:
         return (
             "authentication",
             "GarminDB could not authenticate with Garmin Connect; no fresh data was imported.",
-        )
-    if any(
-        term in lowered
-        for term in (
-            "name or service not known",
-            "network is unreachable",
-            "connection refused",
-            "connection reset",
-            "could not resolve",
-            "timed out",
-            "timeout",
-        )
-    ):
-        return (
-            "network",
-            "GarminDB could not reach Garmin Connect; no fresh data was imported.",
         )
     if "database is locked" in lowered:
         return (
@@ -271,6 +302,7 @@ def main() -> int:
             4,
         )
 
+    log_start = log_size(log_path)
     try:
         with sync_lock(working_dir / ".garmindb_sync.lock"):
             completed = subprocess.run(
@@ -293,8 +325,12 @@ def main() -> int:
         )
 
     private_log = relative_path(log_path, root)
-    if completed.returncode != 0:
-        category, message = classify_failure(completed.stdout or "")
+    log_delta = read_log_delta(log_path, log_start)
+    diagnostic_output = "\n".join(
+        part for part in (completed.stdout or "", log_delta) if part
+    )
+    if completed.returncode != 0 or has_terminal_failure(diagnostic_output):
+        category, message = classify_failure(diagnostic_output)
         return fail(
             "failed",
             category,
