@@ -7,11 +7,11 @@ description: Retrieve and confirm a completed running activity, collect missing 
 
 ## Goal
 
-Retrieve the intended run, verify its identity with the user, combine its objective data with missing qualitative context, and determine whether the active plan or athlete model should change.
+Retrieve and resolve the intended run, combine its objective data with missing qualitative context, and determine whether the active plan or athlete model should change. Ask the user to identify the activity only when the available evidence is genuinely ambiguous.
 
 ## Required Gated Workflow
 
-Do not collapse these gates or produce the analysis before the target activity is confirmed and the available qualitative context is collected. If the user confirms the activity and supplies the missing context in one reply, continue without asking again.
+Do not produce the analysis before the target activity is resolved and the available qualitative context is collected. Resolve an unambiguous activity automatically; require user confirmation only for an ambiguous or conflicting match. If the user supplies the missing context in the original request, continue without asking again.
 
 ### 1. Sync GarminDB When Connected
 
@@ -39,7 +39,7 @@ Keep logs, tokens, downloaded files, and databases under `docs/`. Do not print c
 
 When GarminDB is not connected, use the FIT/GPX file, screenshot, summary, or written data supplied by the user. If no usable activity source exists, ask for one.
 
-### 2. Identify and Confirm the Activity
+### 2. Identify and Resolve the Activity
 
 After a successful sync, or when continuing from the existing local database, list recent running candidates:
 
@@ -54,7 +54,7 @@ python3 .agents/skills/analyze-running-activity/scripts/list_recent_garmindb_run
   --project-root . --date YYYY-MM-DD --limit 20 --json
 ```
 
-Confirm that the requested date has a matching activity before parsing. Match a user-specified time, title, distance, or activity ID when provided; otherwise select the newest running activity as the candidate. Do not silently substitute an activity from another date.
+Confirm that the requested date has a matching activity before parsing. Resolve relative dates such as `today` and `yesterday` to an explicit local date. Match a user-specified time, title, distance, or activity ID when provided; otherwise select the newest running activity as the candidate. Do not silently substitute an activity from another date.
 
 Check the reported lap, record, and split row counts. A GarminDB summary row does not prove that detailed activity data imported successfully. Prefer the corresponding FIT file over the database summary; when the FIT file is missing and detail rows are incomplete, label the objective record as partial.
 
@@ -64,11 +64,18 @@ For a FIT candidate, invoke `parse-fit-run`:
 python3 .agents/skills/parse-fit-run/scripts/parse_fit_run.py path/to/activity.fit --json
 ```
 
-Present a compact identity summary using local start date/time, activity title when useful, distance, duration, saved Garmin feel/effort when present, detail coverage, and activity ID. Never show route coordinates. Ask the user to confirm that this is the intended activity and wait for the answer. If the match is ambiguous, present only the few plausible candidates. Do not analyze an unconfirmed activity.
+Treat the activity as resolved without asking when either condition holds:
+
+- the user supplied the activity file or activity ID and its parsed date does not conflict with the request;
+- exactly one running activity exists on the explicit requested local date, and its available time, distance, title, and supplied context do not materially conflict with the request.
+
+For an automatically resolved activity, continue directly and include the identity summary in the final analysis. Do not ask the user to validate an internal activity ID or repeat that a sole same-day run is theirs.
+
+Ask the user to choose or clarify only when multiple plausible activities exist, the activity date differs from the requested date, supplied details conflict materially with the candidate, or no date/source makes the newest activity uncertain. Present a compact identity summary for only the plausible candidates using local start date/time, title when useful, distance, duration, saved Garmin feel/effort when present, detail coverage, and activity ID. Never show route coordinates. Wait for the answer before analyzing an ambiguous activity.
 
 ### 3. Collect Missing Qualitative Context
 
-After confirmation, begin the question with the explicit activity date—for example, “For the run on `YYYY-MM-DD`…”—and ask only for information the activity data, current conversation, and private record do not already provide:
+After the activity is resolved, begin any needed question with the explicit activity date—for example, “For the run on `YYYY-MM-DD`…”—and ask only for information the activity data, current conversation, and private record do not already provide:
 
 - intended purpose or assigned session;
 - perceived effort and breathing/talk-test experience;
