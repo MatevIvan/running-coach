@@ -1,13 +1,13 @@
 ---
 name: collect-daily-metrics
-description: Collect, validate, store, and interpret daily GarminDB, Garmin, or self-reported recovery metrics, including automatic prior-day sleep reconciliation and Body Battery retrieval when GarminDB is connected. Use when the user provides or requests sleep duration or score, resting heart rate, HRV value/status/baseline, training readiness, Body Battery, stress, soreness, pain, illness, fatigue, nutrition, or daily recovery screenshots; asks whether to train today; or requests an update to the private recovery log.
+description: Collect, validate, store, and interpret daily GarminDB, Garmin, or self-reported recovery metrics; reconcile prior-day sleep and Body Battery when GarminDB is connected; and recommend the specific run or rest decision for that day. Use when the user provides or requests sleep duration or score, resting heart rate, HRV value/status/baseline, training readiness, Body Battery, stress, soreness, pain, illness, fatigue, nutrition, or daily recovery screenshots; asks what run to do or whether to train today; or requests an update to the private recovery log.
 ---
 
 # Collect Daily Metrics
 
 ## Goal
 
-Turn daily recovery information into an accurate permanent record, a compact rolling view, and a proportionate training implication without overreacting to one metric.
+Turn daily recovery information into an accurate permanent record, a compact rolling view, and a specific recovery-adjusted run or rest recommendation without overreacting to one metric.
 
 ## Read First
 
@@ -34,13 +34,13 @@ Complete this sequence before interpreting recovery or updating files:
    ```
 
    The wrapper owns the GarminDB working directory, recovery-only command flags, shared sync lock, private output capture, and database/coverage verification. Do not reconstruct or bypass its underlying command.
-
    - Accept `status: success` only when `sync_completed` and `database_verified` are both `true`. Continue when `coverage_complete` is false, but report the named missing sources.
    - For `status: failed` with category `network`, retry once immediately with network access if the first execution did not have it. Do not interpret stale coverage until that retry finishes.
    - For any other `status: failed`, report its category and use existing data only when exact-date coverage can still be verified.
    - For `status: busy`, wait for the existing GarminDB sync.
    - For `status: not_connected`, continue from user-supplied metrics and state that prior-day verification and Body Battery retrieval are unavailable.
    - Never describe the database as merely stale when the sync failed. Report the failed pull separately from the latest locally available date.
+
 4. Query the prior date read-only:
 
    ```bash
@@ -49,6 +49,7 @@ Complete this sequence before interpreting recovery or updating files:
    ```
 
    For a trend review, use `--start-date YYYY-MM-DD --end-date YYYY-MM-DD`. Check each source independently, including `sleep`, `resting_hr`, `hrv`, `daily_summary`, and relevant monitoring or summary rows. Do not assume one present row means the day is complete.
+
 5. Reconcile the prior date before analyzing the current morning:
    - confirm its sleep duration and score against the existing prior-date raw entry;
    - merge GarminDB sleep stages, resting HR, overnight/rolling HRV, and source provenance when available;
@@ -92,7 +93,14 @@ GarminDB may not contain training readiness or every wearable field. Mark those 
 
 ## Training Decision
 
-State whether the evidence supports the planned session, an easy modification, rest, or additional information. Give restrictions a specific reason and a clear reassessment point.
+Identify the session scheduled for the current date in `This Week's Plan`, then state the recommended session after accounting for the full recovery cluster and recent training load. Distinguish these explicitly when they differ.
+
+Always give a concrete recommendation after the qualitative gate:
+
+- If running is supported, name the run type and prescribe distance or duration, effort target using the most reliable combination of HR, and pace.
+- If the planned run should be shortened or changed, state the original session, the replacement, why it changed, and when the original training intent can be reconsidered. (can be left blank)
+- If rest is recommended or scheduled, say `No run today`, give any appropriate low-cost recovery activity, and state the next reassessment point.
+- If the current plan has no dated session or is stale, say so. Give a conservative provisional recommendation only when the athlete profile, recent load, symptoms, and recovery evidence support it; otherwise state exactly what information is needed before prescribing a run.
 
 Do not force an awkward shuffle, walking, or reduced mileage solely to satisfy an approximate wrist-HR number when breathing, RPE, mechanics, conditions, and the broader trend show controlled effort.
 
@@ -102,5 +110,6 @@ Report:
 
 - what was recorded and any missing or conflicting fields;
 - the meaningful recovery signals, not every device value;
-- the implication for today's or the next planned session;
+- the scheduled session and the specific recommended run or rest prescription for today;
+- the reason for any change, relevant execution/stop conditions, and reassessment point;
 - which private files were updated and why.
