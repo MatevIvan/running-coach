@@ -142,16 +142,16 @@ If a private file appears in Git status as staged or tracked, stop before pushin
 ```
 Date: MM/DD/YYYY
 
-Sleep Duration: 00h 00m
+Sleep Duration: 00h00m
 Sleep score: [number]
-Sleep disruption: [none or brief reason]
+Sleep disruption: [none or brief reason or "restless moments"–number]
 
 Resting HR: [number]
 HRV overnight: [number]
 HRV 7-day average: [number]
 HRV status: [label]
 
-Training readiness: [score/label]
+Training readiness: [score-number]
 Training status: [label]
 
 Soreness/pain: [none, or location + severity 0–10 + improving/same/worse + affects walking/gait yes/no]
@@ -179,6 +179,5 @@ Training readiness:
 Training status:
 
 Soreness/pain:
-
 Illness or unusual fatigue:
 ```
