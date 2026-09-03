@@ -139,7 +139,7 @@ def read_source(
     if not db_path.is_file():
         return result
 
-    connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    connection = sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True)
     connection.row_factory = sqlite3.Row
     try:
         table_exists = connection.execute(

@@ -1,6 +1,6 @@
 # Runner Profile
 
-_Private live athlete record. Onboarding has not been completed._
+_Private live athlete record. Objective-data processing and qualitative onboarding have not been completed._
 
 ## Athlete Baseline
 
@@ -16,7 +16,7 @@ No activity or recovery source has been processed. Historical evidence and revie
 
 ## Estimates and Open Inputs
 
-Initial athlete questionnaire pending.
+GarminDB processing, when selected, and the remaining qualitative questions are pending.
 
 ## Runner Profile
 

@@ -33,6 +33,13 @@ def build_parser() -> argparse.ArgumentParser:
         choices=("config", "password-file", "macos-keychain"),
         default="password-file",
     )
+    create.add_argument(
+        "--mount-dir",
+        help=(
+            "Optional mounted Garmin-device directory. Online Garmin Connect imports "
+            "do not require this path."
+        ),
+    )
     create.add_argument("--enable-weight", action="store_true")
 
     subparsers.add_parser("validate", help="Validate config without printing credentials.")
@@ -90,6 +97,12 @@ def create_config(args: argparse.Namespace, root: Path) -> int:
     config_path = working_dir / "GarminConnectConfig.json"
     data_dir = working_dir / "data"
     password_file = working_dir / ".garmin_password"
+    if args.mount_dir:
+        mount_dir = str(Path(args.mount_dir).expanduser().resolve())
+    elif platform.system() == "Darwin":
+        mount_dir = "/Volumes/GARMIN"
+    else:
+        mount_dir = str(working_dir / "device_mount")
 
     working_dir.mkdir(parents=True, exist_ok=True)
     if config_path.exists():
@@ -121,7 +134,7 @@ def create_config(args: argparse.Namespace, root: Path) -> int:
         "directories": {
             "relative_to_home": False,
             "base_dir": str(data_dir),
-            "mount_dir": "/Volumes/GARMIN",
+            "mount_dir": mount_dir,
         },
         "enabled_stats": {
             "monitoring": True,
@@ -158,6 +171,12 @@ def create_config(args: argparse.Namespace, root: Path) -> int:
 
     print(f"Created GarminDB config: {config_path}")
     print(f"GarminDB data directory: {data_dir}")
+    if os.name == "nt":
+        print(
+            "NOTICE: Windows file permissions are inherited from the containing folder; "
+            "keep docs/ in a private user-owned location and review its ACL if the computer "
+            "or workspace is shared."
+        )
     print("Credentials remain incomplete; edit them locally before validation or download.")
     return 0
 

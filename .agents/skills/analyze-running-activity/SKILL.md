@@ -18,7 +18,7 @@ Do not produce the analysis before the target activity is resolved and the avail
 Treat GarminDB as connected when all of these exist:
 
 - `docs/garmindb/GarminConnectConfig.json`
-- `.venv/bin/garmindb_cli.py` on macOS/Linux, or the equivalent executable under `.venv\Scripts\` on Windows
+- a matching virtual-environment Python and GarminDB script pair under `.venv/bin/` on macOS/Linux or `.venv\Scripts\` on Windows; a packaged Windows GarminDB executable is also acceptable
 - `docs/garmindb/data/`
 
 When connected, run the guarded incremental activity-only sync from the project root:

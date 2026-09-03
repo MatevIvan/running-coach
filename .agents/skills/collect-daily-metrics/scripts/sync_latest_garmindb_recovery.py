@@ -40,13 +40,29 @@ def relative_path(path: Path, root: Path) -> str:
         return str(path)
 
 
-def find_cli(root: Path) -> Path | None:
-    candidates = [
-        root / ".venv" / "bin" / "garmindb_cli.py",
-        root / ".venv" / "Scripts" / "garmindb_cli.py",
+def find_cli_command(root: Path) -> list[str] | None:
+    script_candidates = (
+        (
+            root / ".venv" / "bin" / "python",
+            root / ".venv" / "bin" / "garmindb_cli.py",
+        ),
+        (
+            root / ".venv" / "Scripts" / "python.exe",
+            root / ".venv" / "Scripts" / "garmindb_cli.py",
+        ),
+    )
+    for interpreter, script in script_candidates:
+        if interpreter.is_file() and script.is_file():
+            return [str(interpreter), str(script)]
+
+    executable_candidates = (
         root / ".venv" / "Scripts" / "garmindb_cli.exe",
-    ]
-    return next((path for path in candidates if path.is_file()), None)
+        root / ".venv" / "Scripts" / "garmindb_cli.py.exe",
+    )
+    for executable in executable_candidates:
+        if executable.is_file():
+            return [str(executable)]
+    return None
 
 
 def inspect_config(config_path: Path) -> None:
@@ -72,7 +88,7 @@ def inspect_config(config_path: Path) -> None:
 def database_is_healthy(db_path: Path) -> bool:
     if not db_path.is_file():
         return False
-    connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    connection = sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True)
     try:
         result = connection.execute("PRAGMA quick_check").fetchone()
     finally:
@@ -304,15 +320,15 @@ def main() -> int:
         / "scripts"
         / "read_garmindb_daily.py"
     )
-    cli_path = find_cli(root)
+    cli_command = find_cli_command(root)
 
     missing = [
         relative_path(path, root)
         for path in (config_path, data_dir, reader_path)
         if not path.exists()
     ]
-    if cli_path is None:
-        missing.append(".venv GarminDB CLI")
+    if cli_command is None:
+        missing.append(".venv GarminDB CLI and matching Python interpreter")
     if missing:
         return fail(
             "not_connected",
@@ -351,7 +367,7 @@ def main() -> int:
         before = {}
 
     command = [
-        str(cli_path),
+        *cli_command,
         "--config",
         ".",
         "--monitoring",

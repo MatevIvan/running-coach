@@ -4,6 +4,19 @@
 
 Pass one-off JSON payloads through standard input when a command supports it. If a JSON input file is specifically useful, keep it private under `docs/tmp/` and remove it after a successful write. Distances use meters, durations use seconds, paces use seconds per kilometer, and dates use `YYYY-MM-DD`. Timestamps use ISO 8601.
 
+## GarminDB Projection Boundary
+
+GarminDB remains the complete read-only upstream source for downloaded activity, monitoring, sleep, HRV, and daily-summary data. Do not mirror its raw tables, route points, records, laps, splits, monitoring samples, credentials, or tokens into `docs/running_data.db`.
+
+Project only coaching-ready evidence into this database:
+
+- normalized recent daily recovery rows belong in `recovery_daily`, with exact-date provenance and missing fields preserved;
+- reviewed weekly or monthly aggregates belong in `training_summaries`;
+- durable conclusions and dated measurements belong in `profile_entries` and `profile_measurements`;
+- an individual run belongs in `activity_reviews` only after the activity-analysis workflow has produced a coaching interpretation with the required qualitative context.
+
+During initialization, default to the most recent 28 valid recovery days, up to 90 when needed for a material baseline or trend, the most recent 12 complete weekly training summaries, and useful monthly summaries for older imported history. GarminDB remains queryable for older or more granular objective evidence.
+
 ## Read commands
 
 ```bash

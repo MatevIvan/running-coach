@@ -29,7 +29,7 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 ├── .claude/skills/                   # Claude discovery proxies to canonical skills
 ├── .agents/                          # Canonical skills, scripts, and data contract
 │   └── skills/
-│       ├── initialize-running-project/ # Fresh-clone onboarding and optional GarminDB
+│       ├── initialize-running-project/ # GarminDB-first setup and athlete onboarding
 │       ├── collect-daily-metrics/    # Daily recovery collection and decisions
 │       ├── analyze-running-activity/ # Run review with historical weather lookup
 │       ├── coach-runner/             # Planning and coaching conversations
@@ -76,7 +76,7 @@ The optional `agents/openai.yaml` files provide Codex interface metadata only. T
 
 The current roles are:
 
-- `initialize-running-project`: create the ignored private workspace, collect the initial athlete baseline, and optionally install and import GarminDB.
+- `initialize-running-project`: create the ignored private workspace, prioritize GarminDB installation and import, derive the objective baseline, and then collect only the remaining athlete context.
 - `collect-daily-metrics`: record and interpret recovery data.
 - `analyze-running-activity`: review a completed run, retrieve its historical weather, and decide whether the plan or profile changes.
 - `coach-runner`: answer coaching questions and maintain the broader plan and athlete model.
@@ -91,12 +91,28 @@ This keeps global context small and loads scenario-specific instructions only wh
 
 `docs/running_plan.md` is a compact projection that always has a current week, a broader development objective, and a dated reassessment point. Completed weeks and superseded adjustments remain queryable in SQLite rather than accumulating in Markdown. Without a race, it uses a 4-12 week development block with measurable progression criteria. With a confirmed race, it adds only the event-specific work, taper, rehearsal, and recovery that the event actually requires.
 
+GarminDB remains the complete read-only source for raw wearable data. Initialization projects only coaching-ready evidence into `docs/running_data.db`: recent normalized recovery days, reviewed weekly or monthly training summaries, and durable profile conclusions. Unreviewed activities remain in GarminDB; an individual run enters `activity_reviews` only after the activity-analysis workflow adds the required qualitative context and coaching interpretation.
+
+## Command-Line Compatibility
+
+The repository's executable tooling is Python rather than Bash and is designed to support macOS, Linux, and Windows. Command examples using `python3` mean an available Python 3 interpreter. On Windows, use `py -3` or `python`; virtual-environment executables live under `.venv\Scripts\` instead of `.venv/bin/`. Replace `python3` in one-line examples, and use the explicit PowerShell blocks in the GarminDB setup rather than copying Bash line continuations.
+
+For example, initialize the private workspace on Windows when GarminDB was selected with:
+
+```powershell
+py -3 .agents\skills\initialize-running-project\scripts\initialize_private_workspace.py --project-root . --with-garmindb
+```
+
+The GarminDB setup creates `.venv` and installs `tzdata`. If GarminDB is skipped but FIT parsing or weather lookup needs a named time zone, create the same virtual environment with `py -3 -m venv .venv`, install `tzdata` through `.venv\Scripts\python.exe`, and use that interpreter for the project scripts.
+
+Windows does not apply POSIX `0600`/`0700` modes as file ACLs. Keep the repository in a private user-owned location and inspect the inherited permissions with `Get-Acl .\docs` if the computer or workspace is shared. Git exclusion still applies on every platform.
+
 ## Getting Started
 
 1. Clone the repository.
 2. Open the repository in a supported repository agent.
 3. Ask: `Use the initialize-running-project skill to set up this project for me.` Use `$initialize-running-project` in Codex or `/initialize-running-project` on slash-command surfaces when you prefer explicit invocation.
-4. Choose whether to connect GarminDB, then complete the short athlete questionnaire.
+4. Choose whether to connect GarminDB. When selected, the agent installs and imports GarminDB, analyzes the available objective history, and only then asks the short qualitative questionnaire.
 5. If GarminDB is selected, edit credentials only in the generated private file when prompted; never paste them into chat.
 6. Put any other Garmin/Strava exports and future FIT/GPX activities under `docs/`.
 
@@ -118,7 +134,7 @@ Machine-readable output:
 python3 .agents/skills/parse-fit-run/scripts/parse_fit_run.py docs/activities/example.fit --json
 ```
 
-The parser uses only Python's standard library.
+The parser otherwise uses only Python's standard library. Windows Python installations commonly need the `tzdata` package for named IANA time zones; the GarminDB setup installs it in the project virtual environment.
 
 ## Normal Workflow
 
