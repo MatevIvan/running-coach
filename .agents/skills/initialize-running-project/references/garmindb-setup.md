@@ -56,7 +56,7 @@ GarminDB 3.8.0's published metadata will cause `pip check` to report its old exa
 
 On Windows, use the equivalent executables under `.venv\Scripts\`.
 
-Preserve an existing `.venv`. Inspect it before installing and do not delete or rebuild it without explicit approval. Installing packages and downloading Garmin data require network access.
+Preserve an existing `.venv`. Inspect it before installing and do not delete or rebuild it without explicit approval. Installing packages and downloading Garmin data require network access. If the current harness cannot obtain network access, defer the GarminDB install or import, report the blocked step precisely, and leave the core private workspace usable.
 
 ## 3. Create the Private Configuration
 

@@ -10,6 +10,16 @@ Continuous runner development is the default objective. A race is optional conte
 
 Detailed task workflows live in project skills. Keep this file limited to shared project context, privacy rules, durable-file contracts, and routing.
 
+## Agent and Harness Compatibility
+
+- Treat this `AGENTS.md` file as the canonical project-wide instruction source.
+- Treat `.agents/skills/<skill-name>/SKILL.md` as the canonical definition for each task workflow. Vendor-specific files are discovery adapters only and must not become independent copies of the workflow.
+- When the current harness discovers Agent Skills automatically, invoke the matching skill through that mechanism. Otherwise, use the routing table below, read the matching canonical `SKILL.md` completely, and follow it before taking task-specific action.
+- Map references to filesystem, shell, network, web research, and user-input operations onto the capabilities exposed by the current harness. Request the narrowest necessary authorization before a restricted operation.
+- Local data management and parsing workflows require Python and shell execution. If those capabilities are unavailable, do not claim that a command, database write, import, parse, or verification succeeded; provide the exact command for the user to run or report the workflow as blocked.
+- GarminDB synchronization, historical-weather retrieval, dependency installation, and current product research require network access. If the required capability is unavailable, follow the active skill's local-data fallback when one exists and state the limitation precisely. Never present cached or remembered information as a fresh sync or current web research.
+- Keep credentials, permission settings, hooks, and other harness-local configuration under user control. Do not weaken the privacy boundary to make a workflow run in a particular agent.
+
 ## Privacy Boundary
 
 - Keep all real athlete data and every document derived from it under `docs/`.

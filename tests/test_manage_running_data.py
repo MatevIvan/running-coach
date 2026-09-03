@@ -4,6 +4,8 @@ import importlib.util
 import json
 from pathlib import Path
 import sqlite3
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -308,6 +310,47 @@ class RunningDataTest(unittest.TestCase):
             connection.execute("SELECT distance_m FROM activity_reviews WHERE source_activity_id = 'test:activity:1'").fetchone()[0],
             5000,
         )
+
+    def test_upsert_recovery_reads_stdin_by_default(self) -> None:
+        payload = {
+            "date": "2026-01-09",
+            "sleep_duration": "7h 05min",
+            "sleep_duration_minutes": 425,
+            "sleep_score": 79,
+            "resting_hr_bpm": 48,
+            "hrv": {"value_ms": 57, "seven_day_average_ms": 56, "status": "balanced"},
+            "training_readiness": {"score": 74},
+            "soreness_or_pain": "None.",
+            "illness_or_fatigue": "None.",
+            "notes": "Normal recovery.",
+            "source": "Test stdin payload",
+        }
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT),
+                "--project-root",
+                str(self.root),
+                "upsert-recovery",
+            ],
+            input=json.dumps(payload),
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            check=False,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(json.loads(result.stdout)["recovery_daily"], 1)
+        with sqlite3.connect(self.root / "docs" / "running_data.db") as connection:
+            stored = connection.execute(
+                "SELECT sleep_duration_min, sleep_score FROM recovery_daily WHERE recovery_date = ?",
+                ("2026-01-09",),
+            ).fetchone()
+        self.assertEqual(stored, (425, 79))
+        projection = (self.root / "docs" / "recovery_metrics.md").read_text(encoding="utf-8")
+        self.assertIn("2026-01-09", projection)
 
 
 if __name__ == "__main__":

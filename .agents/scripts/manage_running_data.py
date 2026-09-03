@@ -1295,7 +1295,11 @@ def build_parser() -> argparse.ArgumentParser:
     history.add_argument("--end-date")
     history.add_argument("--limit", type=int, default=100)
     recovery = sub.add_parser("upsert-recovery", help="Upsert one recovery entry from a JSON object")
-    recovery.add_argument("--input", required=True, help="JSON file or - for stdin")
+    recovery.add_argument(
+        "--input",
+        default="-",
+        help="JSON file path; defaults to stdin (-)",
+    )
     profile = sub.add_parser("set-profile-section", help="Version and replace one current profile section")
     profile.add_argument("--section", required=True)
     profile.add_argument("--value-file", required=True)

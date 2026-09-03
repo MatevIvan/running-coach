@@ -33,7 +33,7 @@ Complete this sequence before interpreting recovery or updating files:
 
 1. Resolve and state the current morning metric date as `YYYY-MM-DD`, then calculate the prior calendar date. Current-morning sleep means the sleep session ending that morning.
 2. Treat the user's Garmin/watch entry or screenshot as the normal source for the current morning because GarminDB's standard `--latest` download ends on the prior date.
-3. When GarminDB is connected, run the guarded recovery sync before reading either date. This is a network operation: request or enable network access on the first attempt. In a sandboxed Codex shell, use `sandbox_permissions: require_escalated` with a narrow approval for this script; do not first run the sync in a network-blocked sandbox as a probe.
+3. When GarminDB is connected, run the guarded recovery sync before reading either date. This is a network operation: request or enable narrowly scoped network access on the first attempt using the current harness's authorization mechanism; do not first run the sync in a network-blocked environment as a probe. If network execution cannot be authorized, report the sync as unavailable and follow the exact-date local-data fallback below without describing the local data as freshly synced.
 
    ```bash
    python3 .agents/skills/collect-daily-metrics/scripts/sync_latest_garmindb_recovery.py \
@@ -74,14 +74,14 @@ GarminDB may not contain training readiness or every wearable field. Mark those 
 1. Identify the current metric date and prior date.
 2. Merge the newly synced GarminDB evidence into the existing prior-date database row first. Confirm prior sleep and add prior-day Body Battery/stress without moving either into the current-date entry.
 3. Merge the current morning's user-supplied text or image into the current-date record. Preserve source provenance, uncertainty, approximate values, and missing fields; never let a lower-quality source silently overwrite a better one.
-4. Write each completed date through the shared manager. Prepare one private JSON object under `docs/tmp/` using the established recovery-entry shape, then run:
+4. Write each completed date through the shared manager. Pass one JSON object using the established recovery-entry shape directly on standard input, then run:
 
    ```bash
    python3 .agents/scripts/manage_running_data.py --project-root . \
-     upsert-recovery --input docs/tmp/recovery-entry.json
+     upsert-recovery
    ```
 
-   The command merges the date in `docs/running_data.db`, preserves full source detail in `details_json`, records repeatable qualitative observations separately, and regenerates `docs/recovery_metrics.md`. Remove the temporary input after verifying the write.
+   The command reads stdin by default, merges the date in `docs/running_data.db`, preserves full source detail in `details_json`, records repeatable qualitative observations separately, and regenerates `docs/recovery_metrics.md`. When the execution tool separates process launch from stdin, start the command and send the JSON object to that process. Do not create a temporary JSON file for the normal daily workflow. `--input PATH` remains available when a durable or inspectable payload is specifically useful.
 5. Confirm the regenerated Markdown keeps newest entries first and no more than 14 daily rows. Query `history --kind recovery` for older dates rather than expanding the file.
 6. Use only the most recent 7 valid daily entries for the immediate decision unless the user asks for a longer review.
 7. Change the normalized plan and append a dated plan adjustment before regenerating `docs/running_plan.md` only if the new evidence materially changes the remaining week, next session, mileage cap, long run, quality session, or symptom handling. Use `upsert-plan`, `record-plan-adjustment`, or `set-plan-section`; do not edit historical prose directly into the Markdown file.

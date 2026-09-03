@@ -15,6 +15,10 @@ __pycache__/
 .env.*
 !.env.example
 
+# Harness-local agent preferences and permissions
+/CLAUDE.local.md
+/.claude/settings.local.json
+
 # GarminDB files
 /.venv/
 /HealthData/

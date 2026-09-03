@@ -1,6 +1,6 @@
 ---
 name: parse-fit-run
-description: Parse Garmin/Strava running .fit files for coaching analysis. Use when Codex needs to inspect a FIT activity file, extract run metrics, validate activity date/time, compute distance/time/pace/heart-rate/cadence/power summaries, build splits, compare first half vs second half, or prepare objective data for a run review.
+description: Parse Garmin/Strava running .fit files for coaching analysis. Use when an agent needs to inspect a FIT activity file, extract run metrics, validate activity date/time, compute distance/time/pace/heart-rate/cadence/power summaries, build splits, compare first half vs second half, or prepare objective data for a run review.
 ---
 
 # Parse FIT Run

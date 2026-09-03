@@ -1,6 +1,6 @@
 ---
 name: initialize-running-project
-description: Initialize a fresh clone of the privacy-first running-coach repository by creating its ignored private workspace, collecting athlete onboarding information, seeding the live runner profile and running plan, explaining recommended chat workflows, and optionally installing, configuring, and running GarminDB. Use when a user asks to initialize, onboard, set up, bootstrap, or connect Garmin data for a new copy of this project.
+description: Initialize a fresh clone of the privacy-first running-coach repository by creating its ignored private workspace, collecting athlete onboarding information, seeding the live runner profile and running plan, explaining recommended conversation workflows, and optionally installing, configuring, and running GarminDB. Use when a user asks to initialize, onboard, set up, bootstrap, or connect Garmin data for a new copy of this project.
 ---
 
 # Initialize Running Project
@@ -103,17 +103,17 @@ Read [references/garmindb-setup.md](references/garmindb-setup.md) completely, th
 
 Do not ask the user to paste a Garmin password, MFA code, token, or configuration contents into chat. Generate the private configuration, show its path, and pause while the user edits credentials locally.
 
-### 6. Explain the Recommended Chat Structure
+### 6. Explain the Recommended Conversation Structure
 
 Give the user a compact orientation after setup:
 
-- **Coach chat:** General coaching, weekly reviews, development blocks, plan changes, missed sessions, symptoms affecting future training, race preparation when applicable, and “what should I do next?” Use `coach-runner`.
-- **Run-analysis chat:** Review a completed run from a FIT/GPX file, screenshot, or written metrics. Include purpose, RPE, pain/soreness, terrain/surface, and fueling. When GPS data is available, the skill derives a privacy-limited location and retrieves historical weather automatically. Use `analyze-running-activity`.
-- **Daily-metrics chat:** Manually provide the current morning's sleep and wearable metrics plus fatigue, illness, soreness, and pain. When GarminDB is connected, `collect-daily-metrics` automatically syncs through the prior day, confirms the prior day's sleep, and adds its finalized Body Battery/stress data before interpreting the current morning. This is optional when no daily decision is needed, but useful during heavy training, poor recovery, or symptom monitoring.
-- **Setup/data chat:** Maintain GarminDB, `docs/running_data.db`, imports, privacy checks, and integration failures. Reuse the initialization chat or create a dedicated maintenance chat.
-- **Gear-research chat:** Use `research-running-gear` for purchases that need current product research.
+- **Coach conversation:** General coaching, weekly reviews, development blocks, plan changes, missed sessions, symptoms affecting future training, race preparation when applicable, and “what should I do next?” Use `coach-runner`.
+- **Run-analysis conversation:** Review a completed run from a FIT/GPX file, screenshot, or written metrics. Include purpose, RPE, pain/soreness, terrain/surface, and fueling. When GPS data is available, the skill derives a privacy-limited location and retrieves historical weather automatically. Use `analyze-running-activity`.
+- **Daily-metrics conversation:** Manually provide the current morning's sleep and wearable metrics plus fatigue, illness, soreness, and pain. When GarminDB is connected, `collect-daily-metrics` automatically syncs through the prior day, confirms the prior day's sleep, and adds its finalized Body Battery/stress data before interpreting the current morning. This is optional when no daily decision is needed, but useful during heavy training, poor recovery, or symptom monitoring.
+- **Setup/data conversation:** Maintain GarminDB, `docs/running_data.db`, imports, privacy checks, and integration failures. Reuse the initialization conversation or create a dedicated maintenance conversation.
+- **Gear-research conversation:** Use `research-running-gear` for purchases that need current product research.
 
-Explain that separate chats improve focus. `docs/running_data.db` preserves durable history, while the three Markdown projections provide compact current context. New chats must use live private data and never the root examples.
+Explain that separate conversations improve focus. `docs/running_data.db` preserves durable history, while the three Markdown projections provide compact current context. New conversations must use live private data and never the root examples.
 
 ## Completion Check
 
@@ -125,6 +125,6 @@ Before declaring setup complete:
 - identify whether the initial plan is absent, provisional, or active;
 - report whether GarminDB was skipped, deferred, configured, or successfully imported;
 - when GarminDB ran, report the installed version, requested data horizon, database location, and any targeted import errors;
-- give the exact next chat the user should start.
+- give the exact next conversation the user should start.
 
 Do not treat an incomplete credential step, MFA challenge, failed import, or missing private file as successful initialization.

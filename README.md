@@ -1,6 +1,6 @@
 # Privacy-First Running Coach
 
-This repository turns Codex into a persistent running-performance analyst and coach. It combines Garmin/Strava activity data, recovery metrics, a living runner profile, and an adaptive running plan while keeping the athlete's personal data outside Git.
+This repository equips repository-capable coding agents to act as persistent running-performance analysts and coaches. It combines Garmin/Strava activity data, recovery metrics, a living runner profile, and an adaptive running plan while keeping the athlete's personal data outside Git.
 
 The project is designed to track runs, explain what the training is doing, and plan progressive work that helps the runner improve in a healthy, sustainable way. A race can shape the plan when one is scheduled, but no race is required: without one, the coach uses development blocks, measurable objectives, and dated reassessments. It is not medical software and does not diagnose health conditions.
 
@@ -22,17 +22,12 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 
 ```text
 .
-├── AGENTS.md                         # Project context, privacy, and skill routing
-├── README.md                         # Project overview and setup
-├── .gitignore                        # Excludes all private athlete data
-├── docs/                             # Private local workspace; never committed
-│   ├── runner_profile.md             # Living athlete model
-│   ├── running_plan.md               # Active plan, current week, and development horizon
-│   ├── running_data.db                # Durable recovery, profile, activity, and plan history
-│   ├── recovery_metrics.md           # Rolling 14-day recovery view
-│   ├── activities/                   # New FIT/GPX activities
-│   └── ...                           # Exports, reports, screenshots, and notes
-├── .agents/
+├── AGENTS.md                         # Canonical agent context, privacy, and routing
+├── CLAUDE.md                         # Claude adapter importing AGENTS.md
+├── GEMINI.md                         # Gemini adapter importing AGENTS.md
+├── .github/copilot-instructions.md   # Copilot adapter importing AGENTS.md
+├── .claude/skills/                   # Claude discovery proxies to canonical skills
+├── .agents/                          # Canonical skills, scripts, and data contract
 │   └── skills/
 │       ├── initialize-running-project/ # Fresh-clone onboarding and optional GarminDB
 │       ├── collect-daily-metrics/    # Daily recovery collection and decisions
@@ -40,6 +35,14 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 │       ├── coach-runner/             # Planning and coaching conversations
 │       ├── research-running-gear/    # Current purchase research
 │       └── parse-fit-run/            # Dependency-free FIT activity parser
+├── .gitignore                        # Excludes private data and local settings
+├── docs/                             # Private local workspace; never committed
+│   ├── runner_profile.md             # Living athlete model
+│   ├── running_plan.md               # Active plan, current week, and development horizon
+│   ├── running_data.db                # Durable recovery, profile, activity, and plan history
+│   ├── recovery_metrics.md           # Rolling 14-day recovery view
+│   ├── activities/                   # New FIT/GPX activities
+│   └── ...                           # Exports, reports, screenshots, and notes
 ├── runner_profile_example.md         # Synthetic structure example
 ├── running_plan_example.md           # Synthetic structure example
 └── recovery_metrics_example.md       # Synthetic rolling-view example
@@ -47,11 +50,29 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 
 The root example files are documentation only. `AGENTS.md` explicitly prohibits treating them as real athlete data.
 
-## How Project Instructions Work
+## How Agent Instructions Work
 
-`AGENTS.md` is the project constitution. It gives every chat the shared privacy boundary, database and projection contracts, and common coaching standards. See the official [AGENTS.md guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
+`AGENTS.md` is the canonical project constitution. It gives every compatible agent the shared privacy boundary, database and projection contracts, coaching standards, and task-routing rules. The format is an open convention for repository agents; see [AGENTS.md](https://agents.md/).
 
-Each folder under `.agents/skills/` contains a specialized prompt in `SKILL.md`. Codex scans this repository location automatically. The skill description supports implicit selection: when a request matches it, Codex loads that skill's detailed workflow. `AGENTS.md` also contains a compact routing table so the intended relationship remains explicit and understandable. See the official [skills documentation](https://learn.chatgpt.com/docs/build-skills).
+Each folder under `.agents/skills/` contains the canonical `SKILL.md` for one specialized workflow. These files follow the open [Agent Skills specification](https://agentskills.io/specification). A harness that discovers `.agents/skills/` can load them directly. A harness without native discovery must use the routing table in `AGENTS.md`, read the matching skill completely, and then follow it.
+
+Vendor adapters contain discovery instructions only:
+
+- Claude loads `CLAUDE.md` and discovers regular-file proxies under `.claude/skills/`; each proxy directs it to the canonical `.agents/skills/` directory.
+- Gemini loads `GEMINI.md` and discovers `.agents/skills/` as a supported workspace alias.
+- GitHub Copilot loads its repository adapter or `AGENTS.md` and supports `.agents/skills/` directly on skill-capable surfaces.
+- Cursor and other `AGENTS.md` consumers use the root instructions without a duplicate rules file.
+
+The optional `agents/openai.yaml` files provide Codex interface metadata only. They do not contain canonical workflow behavior. When a canonical skill's `name` or `description` changes, update the same metadata in its Claude proxy; all procedural changes belong only in `.agents/skills/`.
+
+| Harness | Project instructions | Skill discovery | Typical invocation |
+| --- | --- | --- | --- |
+| Codex | `AGENTS.md` | `.agents/skills/` | `Use $initialize-running-project ...` or natural language |
+| Claude Code / Agent SDK | `CLAUDE.md` imports `AGENTS.md` | `.claude/skills/` proxies | `/initialize-running-project` or natural language |
+| Gemini CLI | `GEMINI.md` imports `AGENTS.md` | `.agents/skills/` | `/initialize-running-project` or natural language |
+| GitHub Copilot | `AGENTS.md` and `.github/copilot-instructions.md` | `.agents/skills/` on supported surfaces | `/initialize-running-project` where available, or natural language |
+| Cursor | `AGENTS.md` | Routing table and canonical skill files | Natural language |
+| Other `AGENTS.md` consumers | `AGENTS.md` | Routing table and canonical skill files | Natural language |
 
 The current roles are:
 
@@ -73,13 +94,13 @@ This keeps global context small and loads scenario-specific instructions only wh
 ## Getting Started
 
 1. Clone the repository.
-2. Open the repository as a Codex project.
-3. Ask Codex: `Use $initialize-running-project to set up this project for me.`
+2. Open the repository in a supported repository agent.
+3. Ask: `Use the initialize-running-project skill to set up this project for me.` Use `$initialize-running-project` in Codex or `/initialize-running-project` on slash-command surfaces when you prefer explicit invocation.
 4. Choose whether to connect GarminDB, then complete the short athlete questionnaire.
 5. If GarminDB is selected, edit credentials only in the generated private file when prompted; never paste them into chat.
 6. Put any other Garmin/Strava exports and future FIT/GPX activities under `docs/`.
 
-If the private database or current projections do not exist, Codex should report that live athlete data is unavailable. It should never fall back to the synthetic examples.
+If the private database or current projections do not exist, the agent must report that live athlete data is unavailable. It must never fall back to the synthetic examples.
 
 ## FIT Activity Parsing
 
@@ -103,7 +124,7 @@ The parser uses only Python's standard library.
 
 For a new run:
 
-1. Ask `analyze-running-activity` to review the run. When GarminDB is connected, it first performs an incremental activity sync; otherwise, add the activity file under `docs/activities/` or provide its details in chat.
+1. Ask `analyze-running-activity` to review the run. When GarminDB is connected, it first performs an incremental activity sync; otherwise, add the activity file under `docs/activities/` or provide its details in the conversation.
 2. The skill resolves an unambiguous candidate automatically and asks only when multiple activities plausibly match.
 3. When GPS data is available, the skill derives a privacy-limited route location and retrieves historical temperature, apparent temperature, humidity, dew point, precipitation, wind, and gusts for the activity window.
 4. Answer its short follow-up about information the device and weather archive do not know, such as intended purpose, perceived effort, pain or soreness, surface/footing, unusual localized exposure, and fueling.

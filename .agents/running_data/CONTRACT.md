@@ -2,7 +2,7 @@
 
 `docs/running_data.db` is the durable historical record. The Markdown files under `docs/` are compact current-context projections. Write the database first and regenerate the affected projection with `.agents/scripts/manage_running_data.py`.
 
-All JSON input files are private temporary files under `docs/tmp/`. Remove them after a successful write. Distances use meters, durations use seconds, paces use seconds per kilometer, and dates use `YYYY-MM-DD`. Timestamps use ISO 8601.
+Pass one-off JSON payloads through standard input when a command supports it. If a JSON input file is specifically useful, keep it private under `docs/tmp/` and remove it after a successful write. Distances use meters, durations use seconds, paces use seconds per kilometer, and dates use `YYYY-MM-DD`. Timestamps use ISO 8601.
 
 ## Read commands
 
@@ -36,8 +36,10 @@ Use the existing recovery-entry field names so device wording and provenance rem
 ```
 
 ```bash
-python3 .agents/scripts/manage_running_data.py --project-root . upsert-recovery --input docs/tmp/recovery-entry.json
+python3 .agents/scripts/manage_running_data.py --project-root . upsert-recovery
 ```
+
+`upsert-recovery` reads the JSON object from stdin by default. Use `--input PATH` only when a file-backed payload is specifically useful; `--input -` is an explicit synonym for stdin.
 
 ## Activity-review input
 

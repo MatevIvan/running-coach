@@ -34,6 +34,8 @@ Ask a concise question only when a missing answer would materially change the re
 
 Browse the web because products, prices, stock, specifications, and model generations change.
 
+If the current harness has no web or network research capability, say that current product verification is unavailable and do not present remembered prices, availability, specifications, or model status as current. When useful, provide only a clearly labeled decision framework based on the athlete's established needs and identify what still requires current verification.
+
 - Use manufacturer documentation for specifications, sizing, compatibility, warranty, and current models.
 - Use reputable independent testing or reviews for ride, fit tendencies, durability, real-world usability, and limitations.
 - Verify important claims across more than one source when practical.
