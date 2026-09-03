@@ -2,6 +2,8 @@
 
 > **Example data only.** Every athlete detail and training value in this file is fictional. This file documents the expected structure and must never be used for coaching decisions.
 
+This demonstrates the compact current-context projection. Historical profile and activity evidence belongs in `docs/running_data.db`.
+
 Last updated: 2027-04-05
 
 Data sources: mock Strava export, three mock FIT activities, and synthetic recovery entries.

@@ -15,7 +15,14 @@ Read:
 
 - `docs/runner_profile.md`
 - `docs/running_plan.md`
-- `docs/recovery_metrics_raw.json` and `docs/recovery_metrics.md` when recent recovery affects the question
+- `docs/recovery_metrics.md` when recent recovery affects the question
+- current database context when the decision depends on structured plan, profile, or recovery state:
+
+  ```bash
+  python3 .agents/scripts/manage_running_data.py --project-root . context --section all --days 14
+  ```
+
+Use a date-bounded `manage_running_data.py history` query when older recovery, activities, summaries, adjustments, or profile versions are material. Do not expand the Markdown projections to recover history.
 
 Use live private data, never root examples.
 
@@ -51,7 +58,7 @@ Prefer trends and comparable-condition evidence over single-run conclusions. Do 
 
 ## Maintain the Athlete Model
 
-Keep `docs/runner_profile.md` current when evidence materially changes:
+Keep the current profile records and their compact `docs/runner_profile.md` projection current when evidence materially changes:
 
 - volume, consistency, or recent mileage trends;
 - long-run history and endurance durability;
@@ -60,11 +67,11 @@ Keep `docs/runner_profile.md` current when evidence materially changes:
 - aerobic base, speed capacity, pacing discipline, and recovery capacity;
 - current development goals, optional event context, general readiness, goal-specific readiness, strengths, weaknesses, and principal risks.
 
-Maintain `Facts Supported by Running Data` as a cumulative factual ledger. After a weekly report, verify the completed week's mileage and run count, month totals, longest-run evidence, terrain/sensor limitations, race evidence, and corrections. Label reconstructions and incomplete data.
+Store completed weekly or monthly totals in `training_summaries` instead of maintaining a cumulative Markdown ledger. After a weekly report, verify the completed week's mileage and run count, month totals when applicable, longest-run evidence, terrain/sensor limitations, race evidence, and corrections. Label reconstructions and incomplete data.
 
 ## Maintain the Plan
 
-Keep `This Week's Plan` near the top of `docs/running_plan.md`. Include:
+Keep the normalized active block, week, sessions, and session items current, and keep `This Week's Plan` near the top of the regenerated `docs/running_plan.md`. Include:
 
 - week dates and operating goal;
 - weekly mileage target or cap and mileage completed;
@@ -82,7 +89,7 @@ When no race is confirmed:
 
 When a race is confirmed:
 
-- store its date, distance, course/context, and finish-versus-performance priority in `docs/runner_profile.md`;
+- store its date, distance, course/context, status, and finish-versus-performance priority in `events`, then reflect only the active context in `docs/runner_profile.md`;
 - make the plan event-specific only as early as specificity is useful;
 - add race-pace practice, taper, fueling/equipment rehearsal, and post-race recovery in proportion to the event;
 - preserve the athlete's longer-term development objective beyond race day.
@@ -108,9 +115,11 @@ Increase concern with recurrence in the same location, worsening intensity/durat
 
 ## Durable Updates
 
-- Update `docs/runner_profile.md` for material athlete-model changes.
-- Update `docs/running_plan.md` for material operating-plan changes.
-- Update both when evidence changes both the model and plan.
+- Read `.agents/running_data/CONTRACT.md` before making a durable update.
+- Use `set-profile-section`, `record-profile-measurement`, or `upsert-event` for material athlete-model or event changes; regenerate `docs/runner_profile.md` afterward.
+- Use `upsert-plan`, `record-plan-adjustment`, and `set-plan-section` for material operating-plan changes; regenerate `docs/running_plan.md` afterward.
+- Use `record-summary` when a completed week or other reviewed period becomes durable evidence.
+- Write the database first. Treat Markdown as a compact projection and never append historical logs directly to it.
 - State when no durable update is needed.
 
 Use a response structure appropriate to the coaching question rather than forcing the individual-run A-J format.

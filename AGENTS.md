@@ -21,16 +21,19 @@ Detailed task workflows live in project skills. Keep this file limited to shared
 
 ## Live Athlete Record
 
-Use these private files as the durable source of truth:
+Use `docs/running_data.db` as the durable source of truth for recovery history, profile history and measurements, events, training summaries, activity reviews, training blocks, plan weeks and sessions, and plan adjustments.
 
-- `docs/runner_profile.md`: the living athlete model, factual training ledger, goals, optional event context, zones, strengths, weaknesses, risks, and readiness.
-- `docs/running_plan.md`: the active operating plan, including the near-top `This Week's Plan` and the broader development horizon.
-- `docs/recovery_metrics_raw.json`: the permanent daily recovery history.
-- `docs/recovery_metrics.md`: the compact rolling recovery view.
+Use these generated private Markdown files as compact current-context projections:
+
+- `docs/runner_profile.md`: the current athlete model, goals, zones, strengths, weaknesses, risks, and readiness. Historical ledgers and prior profile versions belong in SQLite.
+- `docs/running_plan.md`: the active operating plan, including `This Week's Plan` and the current development horizon. Completed weeks and superseded adjustments belong in SQLite.
+- `docs/recovery_metrics.md`: the most recent 14 recovery days and current interpretation rules. Older entries and full source detail belong in SQLite.
+
+Use `.agents/scripts/manage_running_data.py` for migrations, current-context reads, date-bounded history, durable writes, verification, and Markdown regeneration. Write SQLite first and regenerate the affected Markdown projection second. Do not recreate `docs/recovery_metrics_raw.json` after the verified legacy cutover.
 
 Raw Garmin/Strava data, FIT/GPX activities, reports, screenshots, and supporting files also belong under `docs/`.
 
-Before using athlete-specific facts, read the relevant private files. Make actual data the source of truth and label material gaps rather than filling them with assumptions.
+Before using athlete-specific facts, read the relevant compact projection and query SQLite when historical or structured detail is material. Make actual data the source of truth and label material gaps rather than filling them with assumptions.
 
 ## GarminDB Data Source
 
@@ -81,8 +84,8 @@ Skill descriptions can trigger automatically. These routing rules provide a proj
 - When an event is active, treat it as a planning constraint and opportunity for specificity—not permission to override health, compress missed training, or force unsupported targets.
 - Do not let a temporary restriction become the long-term plan without a reason, exit criteria, and reassessment point.
 - Do not make a watch status label or approximate wrist-HR boundary a rigid training decision by itself.
-- Update private durable files only when the active skill's workflow calls for it and the new evidence materially changes the record or plan.
-- Preserve older raw recovery entries and cumulative factual training history.
+- Update private durable records only when the active skill's workflow calls for it. Record completed activity analyses and daily recovery observations even when they do not materially change the profile or plan.
+- Preserve older recovery entries, activity reviews, plan adjustments, profile versions, and cumulative training summaries in SQLite. Keep them out of the compact Markdown projections.
 
 ## Communication
 

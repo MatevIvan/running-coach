@@ -2,6 +2,8 @@
 
 > **Example data only.** This schedule is fictional, is not a prescription, and must never be used as the live athlete plan.
 
+This demonstrates the compact active-plan projection. Completed weeks and superseded adjustments belong in `docs/running_data.db`.
+
 Last updated: 2027-04-05
 
 Source profile: `runner_profile_example.md` demonstrates the format. A real local project uses `docs/runner_profile.md`.

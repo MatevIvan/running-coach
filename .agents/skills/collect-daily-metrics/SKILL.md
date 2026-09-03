@@ -13,7 +13,14 @@ Turn daily recovery information into an accurate permanent record, a compact rol
 
 Read:
 
-- `docs/recovery_metrics_raw.json`
+- `.agents/running_data/CONTRACT.md` before writing recovery data
+- the latest database recovery context:
+
+  ```bash
+  python3 .agents/scripts/manage_running_data.py --project-root . \
+    context --section recovery --days 14
+  ```
+
 - `docs/recovery_metrics.md`
 - `docs/running_plan.md`
 - `docs/runner_profile.md` only when baseline, symptoms, or a durable trend matters
@@ -65,20 +72,20 @@ GarminDB may not contain training readiness or every wearable field. Mark those 
 ## Workflow
 
 1. Identify the current metric date and prior date.
-2. Merge the newly synced GarminDB evidence into the existing prior-date entry first. Confirm prior sleep and add prior-day Body Battery/stress without moving either into the current-date entry.
-3. Merge the current morning's user-supplied text or image into the current-date entry. Preserve source provenance, uncertainty, approximate values, and missing fields; never let a lower-quality source silently overwrite a better one.
-4. Update `docs/recovery_metrics_raw.json`:
-   - merge a resubmitted date instead of duplicating it;
-   - preserve valid fields not replaced by newer evidence;
-   - keep all older entries;
-   - retain raw device wording where it helps provenance.
-5. Update `docs/recovery_metrics.md` second:
-   - keep newest entries first;
-   - keep no more than 14 daily rows;
-   - summarize the day's recovery cluster and training implication compactly.
+2. Merge the newly synced GarminDB evidence into the existing prior-date database row first. Confirm prior sleep and add prior-day Body Battery/stress without moving either into the current-date entry.
+3. Merge the current morning's user-supplied text or image into the current-date record. Preserve source provenance, uncertainty, approximate values, and missing fields; never let a lower-quality source silently overwrite a better one.
+4. Write each completed date through the shared manager. Prepare one private JSON object under `docs/tmp/` using the established recovery-entry shape, then run:
+
+   ```bash
+   python3 .agents/scripts/manage_running_data.py --project-root . \
+     upsert-recovery --input docs/tmp/recovery-entry.json
+   ```
+
+   The command merges the date in `docs/running_data.db`, preserves full source detail in `details_json`, records repeatable qualitative observations separately, and regenerates `docs/recovery_metrics.md`. Remove the temporary input after verifying the write.
+5. Confirm the regenerated Markdown keeps newest entries first and no more than 14 daily rows. Query `history --kind recovery` for older dates rather than expanding the file.
 6. Use only the most recent 7 valid daily entries for the immediate decision unless the user asks for a longer review.
-7. Update `docs/running_plan.md` only if the new recovery evidence materially changes the remaining week, next session, mileage cap, long run, quality session, or symptom handling.
-8. Update `docs/runner_profile.md` only when a repeated or longer-term pattern materially changes the athlete model or risk assessment.
+7. Change the normalized plan and append a dated plan adjustment before regenerating `docs/running_plan.md` only if the new evidence materially changes the remaining week, next session, mileage cap, long run, quality session, or symptom handling. Use `upsert-plan`, `record-plan-adjustment`, or `set-plan-section`; do not edit historical prose directly into the Markdown file.
+8. Version the affected profile section or add a profile measurement before regenerating `docs/runner_profile.md` only when a repeated or longer-term pattern materially changes the athlete model or risk assessment. Use `set-profile-section` or `record-profile-measurement`.
 
 ## Interpretation
 
@@ -112,4 +119,4 @@ Report:
 - the meaningful recovery signals, not every device value;
 - the scheduled session and the specific recommended run or rest prescription for today;
 - the reason for any change, relevant execution/stop conditions, and reassessment point;
-- which private files were updated and why.
+- which database records and compact private projections were updated and why.

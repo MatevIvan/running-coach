@@ -4,14 +4,14 @@
 
 Last updated: 2027-04-05
 
-Purpose: demonstrate the compact rolling view. A real local project uses `docs/recovery_metrics.md` and treats `docs/recovery_metrics_raw.json` as the permanent source of truth.
+Purpose: demonstrate the compact rolling view. A real local project uses `docs/recovery_metrics.md` as a current projection and `docs/running_data.db` as the permanent source of truth.
 
 ## Use Rules
 
 - Keep this as a rolling log, not a full-history archive.
 - Use the most recent 7 valid daily entries for run decisions.
 - Keep at most the most recent 14 daily entries.
-- Update the private raw JSON first, then the private rolling Markdown view.
+- Update the private SQLite record first, then regenerate the private rolling Markdown view.
 - Look for clusters across sleep, resting HR, HRV, readiness, symptoms, and run response.
 - These metrics guide adjustment; they do not diagnose medical conditions.
 

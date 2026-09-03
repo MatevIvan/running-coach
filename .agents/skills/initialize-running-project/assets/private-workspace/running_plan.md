@@ -2,6 +2,8 @@
 
 _Private live operating plan. Onboarding has not been completed._
 
+Historical plan data belongs in `docs/running_data.db`; keep this file focused on the active operating plan.
+
 ## Plan Status
 
 No active plan has been established.

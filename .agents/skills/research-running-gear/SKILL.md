@@ -11,7 +11,7 @@ Produce a current, evidence-backed buying recommendation tied to the athlete's u
 
 ## Establish the Use Case
 
-Read `docs/runner_profile.md` and `docs/running_plan.md` only when athlete-specific fit, current equipment, injury history, development or event needs, climate, or training volume matters.
+Read the compact `docs/runner_profile.md` and `docs/running_plan.md` projections only when athlete-specific fit, current equipment, symptom history, development or event needs, climate, or training volume matters. Query current or historical records from `docs/running_data.db` only when the projections do not contain the evidence needed for the purchase decision.
 
 When recent training volume, long-run distance, terrain, climate exposure, or activity history would materially affect the recommendation:
 
@@ -66,4 +66,4 @@ Lead with the recommendation. Provide:
 
 Do not buy, reserve, message sellers, or make other external changes unless the user explicitly requests and authorizes that action.
 
-Do not update the private athlete record from a recommendation alone. Update equipment facts only after the user confirms a purchase, retirement, or actual use and asks for the record to change.
+Do not update the private athlete record from a recommendation alone. After the user confirms a purchase, retirement, or actual use and asks for the record to change, read `.agents/running_data/CONTRACT.md`, version the relevant profile section with `manage_running_data.py set-profile-section`, and regenerate the compact profile; do not append equipment history directly to Markdown.

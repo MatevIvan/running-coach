@@ -95,7 +95,8 @@ Before analysis, read:
 
 - `docs/runner_profile.md`
 - `docs/running_plan.md`
-- `docs/recovery_metrics_raw.json` and `docs/recovery_metrics.md` when recovery or recent symptoms affect interpretation
+- `docs/recovery_metrics.md` when recovery or recent symptoms affect interpretation
+- the relevant current or historical rows from `docs/running_data.db` when the compact projections do not contain enough context. Use `manage_running_data.py context` for current state and a date-bounded `history` query for older recovery, activities, summaries, adjustments, or profile entries.
 
 Never substitute root example files.
 
@@ -124,13 +125,22 @@ Never substitute root example files.
 
 ### 7. Update the Plan and Durable Files
 
+- Read `.agents/running_data/CONTRACT.md` before preparing database writes.
+- Record every completed analysis in `activity_reviews`, even when it does not change the athlete model or plan. Prepare a private JSON object with `source_activity_id`, `started_at`, typed summary fields, `outcome`, and any uncommon evidence in the remaining object, then run:
+
+  ```bash
+  python3 .agents/scripts/manage_running_data.py --project-root . \
+    record-activity --input docs/tmp/activity-review.json
+  ```
+
 - Decide whether the next run should be kept, modified, or skipped.
 - Check the next 7 days for both injury/under-recovery risk and undertraining risk.
 - Give any restriction a reason, exit criteria, and reassessment point.
-- Update `docs/running_plan.md` when the activity materially changes the remaining week, mileage target, next workout, long run, recovery need, symptom handling, or progress toward the current development objective.
-- Update `docs/runner_profile.md` when the activity materially changes the athlete model, zones, durability, pacing/HR interpretation, strengths, weaknesses, or risk.
-- Do not add an incomplete week to `Facts Supported by Running Data`; close it during a weekly review.
-- If the run is a one-off observation and the active plan remains correct, update neither durable file.
+- Update normalized plan rows and append a plan adjustment when the activity materially changes the remaining week, mileage target, next workout, long run, recovery need, symptom handling, or progress toward the current development objective. Regenerate the compact plan through the shared manager.
+- Version the relevant current profile section or add a measurement when the activity materially changes the athlete model, zones, durability, pacing/HR interpretation, strengths, weaknesses, or risk. Regenerate the compact profile through the shared manager.
+- Do not add an incomplete week to `training_summaries`; close it during a weekly review.
+- If the run is a one-off observation and the active plan remains correct, record only the activity review.
+- Remove private temporary JSON or section files after verifying the database write.
 
 ### 8. Return the Analysis Report
 
@@ -149,4 +159,4 @@ I. One clear takeaway
 J. Durable file updates
 ```
 
-In section J, state whether `docs/runner_profile.md`, `docs/running_plan.md`, both, or neither were updated, and why.
+In section J, state which database records were written, whether `docs/runner_profile.md` or `docs/running_plan.md` was regenerated, and why.

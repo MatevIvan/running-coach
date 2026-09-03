@@ -21,7 +21,6 @@ PRIVATE_DIRS = (
 TEMPLATE_FILES = (
     "runner_profile.md",
     "running_plan.md",
-    "recovery_metrics_raw.json",
     "recovery_metrics.md",
 )
 
@@ -170,6 +169,24 @@ def main() -> int:
         if not args.dry_run:
             shutil.copyfile(template_dir / name, destination)
             set_private_mode(destination, 0o600)
+
+    database = docs / "running_data.db"
+    manager = root / ".agents" / "scripts" / "manage_running_data.py"
+    if args.dry_run:
+        print(f"{'PRESERVE' if database.exists() else 'WOULD CREATE'} database {database.relative_to(root)}")
+    elif not manager.is_file():
+        print(f"ERROR: Running-data manager not found: {manager}", file=sys.stderr)
+        return 2
+    else:
+        result = subprocess.run(
+            [sys.executable, str(manager), "--project-root", str(root), "init"],
+            cwd=root,
+            check=False,
+        )
+        if result.returncode != 0:
+            print("ERROR: Could not initialize docs/running_data.db.", file=sys.stderr)
+            return result.returncode
+        set_private_mode(database, 0o600)
 
     print("Private workspace initialization complete." if not args.dry_run else "Dry run complete.")
     return 0

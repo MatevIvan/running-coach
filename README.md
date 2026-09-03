@@ -8,8 +8,7 @@ The project is designed to track runs, explain what the training is doing, and p
 
 All real athlete data lives in `docs/`, which is ignored by Git. This includes:
 
-- The live runner profile and running plan
-- Raw and rolling recovery logs
+- The private SQLite history and compact runner-profile, running-plan, and recovery projections
 - FIT, GPX, CSV, screenshot, and export data
 - Generated athlete reports and any other derived personal documents
 
@@ -27,7 +26,7 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 ├── docs/                             # Private local workspace; never committed
 │   ├── runner_profile.md             # Living athlete model
 │   ├── running_plan.md               # Active plan, current week, and development horizon
-│   ├── recovery_metrics_raw.json     # Permanent recovery history
+│   ├── running_data.db                # Durable recovery, profile, activity, and plan history
 │   ├── recovery_metrics.md           # Rolling 14-day recovery view
 │   ├── activities/                   # New FIT/GPX activities
 │   └── ...                           # Exports, reports, screenshots, and notes
@@ -41,7 +40,6 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 │       └── parse-fit-run/            # Dependency-free FIT activity parser
 ├── runner_profile_example.md         # Synthetic structure example
 ├── running_plan_example.md           # Synthetic structure example
-├── recovery_metrics_raw_example.json # Synthetic raw-log example
 └── recovery_metrics_example.md       # Synthetic rolling-view example
 ```
 
@@ -49,7 +47,7 @@ The root example files are documentation only. `AGENTS.md` explicitly prohibits 
 
 ## How Project Instructions Work
 
-`AGENTS.md` is the project constitution. It gives every chat the shared privacy boundary, live-file locations, durable-record contract, and common coaching standards. See the official [AGENTS.md guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
+`AGENTS.md` is the project constitution. It gives every chat the shared privacy boundary, database and projection contracts, and common coaching standards. See the official [AGENTS.md guidance](https://learn.chatgpt.com/docs/agent-configuration/agents-md).
 
 Each folder under `.agents/skills/` contains a specialized prompt in `SKILL.md`. Codex scans this repository location automatically. The skill description supports implicit selection: when a request matches it, Codex loads that skill's detailed workflow. `AGENTS.md` also contains a compact routing table so the intended relationship remains explicit and understandable. See the official [skills documentation](https://learn.chatgpt.com/docs/build-skills).
 
@@ -66,9 +64,9 @@ This keeps global context small and loads scenario-specific instructions only wh
 
 ## Planning Model
 
-`docs/runner_profile.md` holds the athlete's continuing development goals and an explicit `Goals and Event Context` section. That section records `none` when no event is planned; when a race is relevant, it records the date, distance, course context, and finish-versus-performance priority.
+`docs/running_data.db` stores the durable athlete history. `docs/runner_profile.md` is a compact current projection containing the athlete's continuing development goals and an explicit `Goals and Event Context` section. That section records `none` when no event is planned; when a race is relevant, it records the date, distance, course context, and finish-versus-performance priority.
 
-`docs/running_plan.md` always has a current week, a broader development objective, and a dated reassessment point. Without a race, it uses a 4-12 week development block with measurable progression criteria. With a confirmed race, it adds only the event-specific work, taper, rehearsal, and recovery that the event actually requires.
+`docs/running_plan.md` is a compact projection that always has a current week, a broader development objective, and a dated reassessment point. Completed weeks and superseded adjustments remain queryable in SQLite rather than accumulating in Markdown. Without a race, it uses a 4-12 week development block with measurable progression criteria. With a confirmed race, it adds only the event-specific work, taper, rehearsal, and recovery that the event actually requires.
 
 ## Getting Started
 
@@ -79,7 +77,7 @@ This keeps global context small and loads scenario-specific instructions only wh
 5. If GarminDB is selected, edit credentials only in the generated private file when prompted; never paste them into chat.
 6. Put any other Garmin/Strava exports and future FIT/GPX activities under `docs/`.
 
-If the private working files do not exist, Codex should report that live athlete data is unavailable. It should never fall back to the synthetic examples.
+If the private database or current projections do not exist, Codex should report that live athlete data is unavailable. It should never fall back to the synthetic examples.
 
 ## FIT Activity Parsing
 
@@ -107,9 +105,18 @@ For a new run:
 2. Confirm the candidate activity identified by the skill.
 3. Answer its short follow-up about information the device does not know, such as intended purpose, perceived effort, pain or soreness, weather, terrain, and fueling.
 4. The skill parses the FIT file when available, compares the confirmed run with the current private profile and plan, and returns the standard analysis report.
-5. Durable private files change only when the new evidence materially changes the athlete model or active schedule.
+5. Every analyzed activity is recorded in SQLite. Compact profile or plan projections change only when the new evidence materially changes the athlete model or active schedule.
 
-For daily recovery data, provide the current morning's sleep and wearable metrics manually. When GarminDB is connected, `collect-daily-metrics` first syncs through yesterday, confirms yesterday's sleep, and adds yesterday's finalized Body Battery/stress to that prior-date record. It then updates `docs/recovery_metrics_raw.json` and refreshes the compact `docs/recovery_metrics.md` view. Day-to-day decisions use the most recent seven valid entries; the rolling Markdown view keeps no more than fourteen.
+For daily recovery data, provide the current morning's sleep and wearable metrics manually. When GarminDB is connected, `collect-daily-metrics` first syncs through yesterday, confirms yesterday's sleep, and adds yesterday's finalized Body Battery/stress to that prior-date record. It then upserts the recovery date in `docs/running_data.db` and refreshes `docs/recovery_metrics.md`. Day-to-day decisions use the most recent seven valid entries; the rolling Markdown view keeps no more than fourteen.
+
+The shared manager handles database operations and projection regeneration:
+
+```bash
+python3 .agents/scripts/manage_running_data.py --project-root . verify
+python3 .agents/scripts/manage_running_data.py --project-root . context --section all --days 14
+python3 .agents/scripts/manage_running_data.py --project-root . history --kind recovery --start-date YYYY-MM-DD --end-date YYYY-MM-DD
+python3 .agents/scripts/manage_running_data.py --project-root . render
+```
 
 Use `coach-runner` for weekly reviews, development-block planning, pacing, performance growth, or general training questions. It also handles race preparation and strategy when an event is part of the runner's current goals. Use `research-running-gear` for purchases and product comparisons that require current web research.
 
@@ -144,7 +151,7 @@ Date: MM/DD/YYYY
 
 Sleep Duration: 00h00m
 Sleep score: [number]
-Sleep disruption: [none or brief reason or "restless moments"–number]
+Sleep disruption: [none or brief reason]
 
 Resting HR: [number]
 HRV overnight: [number]
@@ -155,7 +162,6 @@ Training readiness: [score-number]
 Training status: [label]
 
 Soreness/pain: [none, or location + severity 0–10 + improving/same/worse + affects walking/gait yes/no]
-
 Illness or unusual fatigue: [none or brief description]
 ```
 
