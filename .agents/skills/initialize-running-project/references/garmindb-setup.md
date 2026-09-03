@@ -20,7 +20,7 @@ Offer these credential modes:
 2. `password-file`: portable and private; store the password in `docs/garmindb/.garmin_password` with restrictive permissions.
 3. `config`: simplest, but stores the password directly in the ignored JSON configuration.
 
-Never request a password or MFA code in chat.
+Never request a password or MFA code in the conversation.
 
 ## 2. Check Python and Install
 
@@ -122,8 +122,8 @@ Do not read the entire potentially large log. Check:
 
 Separate harmless unsupported FIT messages from failures that omit an activity, lap, record stream, or daily metric. Report partial imports precisely.
 
-## 6. Hand Off
+## 6. Return the Verified Import
 
-Record only non-secret setup facts in the final response: GarminDB version, date horizon, activity cap, enabled statistics, database directory, and whether validation passed.
+Return only non-secret setup facts to the main initialization workflow: GarminDB version, requested date horizon, activity cap, enabled statistics, database directory, actual per-stream coverage, and whether validation passed. Do not treat the GarminDB branch as complete until the main workflow has processed the imported history through `garmindb-bootstrap-analysis.md`.
 
 Do not copy Garmin credentials, tokens, route data, health values, or database contents into tracked files. Future syncs should use the incremental `--latest` command.

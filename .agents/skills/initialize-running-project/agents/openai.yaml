@@ -1,4 +1,4 @@
 interface:
   display_name: "Initialize Running Project"
-  short_description: "Create the private athlete workspace and GarminDB"
-  default_prompt: "Use $initialize-running-project to set up this running-coach repository for a new athlete."
+  short_description: "Import GarminDB and build the athlete baseline"
+  default_prompt: "Use $initialize-running-project to set up this repository, prioritize GarminDB, analyze its imported history, and then collect only the remaining athlete context."

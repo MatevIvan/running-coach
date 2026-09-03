@@ -1,13 +1,13 @@
 ---
 name: initialize-running-project
-description: Initialize a fresh clone of the privacy-first running-coach repository by creating its ignored private workspace, collecting athlete onboarding information, seeding the live runner profile and running plan, explaining recommended conversation workflows, and optionally installing, configuring, and running GarminDB. Use when a user asks to initialize, onboard, set up, bootstrap, or connect Garmin data for a new copy of this project.
+description: Initialize a fresh clone of the privacy-first running-coach repository by creating its ignored private workspace, prioritizing GarminDB installation and import when selected, deriving the objective athlete baseline before qualitative onboarding, and seeding the live runner profile and running plan. Use when a user asks to initialize, onboard, set up, bootstrap, connect Garmin data, or build a coaching baseline for a new copy of this project.
 ---
 
 # Initialize Running Project
 
 ## Goal
 
-Create a usable private athlete workspace and its SQLite record without exposing personal data or credentials, then leave the user with a clear workflow for ongoing coaching, recovery collection, and activity analysis.
+Create a usable private athlete workspace and SQLite record without exposing personal data or credentials. When GarminDB is selected, get it running and process its objective history before asking coaching questions, then collect only the qualitative context and constraints that the imported data cannot establish.
 
 Read `.agents/running_data/CONTRACT.md` before seeding athlete, event, or plan records.
 
@@ -23,7 +23,7 @@ Make the first user-facing question:
 
 Wait for the answer before creating or installing anything. Do not combine this with the athlete questionnaire.
 
-- For **yes**, record the decision and continue through core setup before the GarminDB branch.
+- For **yes**, record the decision, create the protected private workspace, and complete the GarminDB import and objective-data review before athlete onboarding.
 - For **no** or **not now**, skip all GarminDB installation and credential steps. Explain that it can be added later by invoking this skill again.
 
 ### 2. Protect the Privacy Boundary
@@ -68,42 +68,49 @@ Run the database verifier and do not copy mock values from root example files:
 python3 .agents/scripts/manage_running_data.py --project-root . verify
 ```
 
-### 4. Onboard the Athlete in Short Batches
+### 4. Complete GarminDB Before Coaching Onboarding When Selected
 
-Ask only questions that materially improve the initial athlete model. Accept “unknown,” “not applicable,” and “prefer not to answer.” Do not request all answers in one oversized message.
+When GarminDB was selected, read [references/garmindb-setup.md](references/garmindb-setup.md) completely and follow it in order now. Before the import, ask only for GarminDB setup choices: history horizon, activity cap, units, weight-data preference, and credential mode. Do not mix in the athlete questionnaire.
 
-First collect the minimum baseline:
+Do not ask the user to paste a Garmin password, MFA code, token, or configuration contents into the conversation. Generate the private configuration, show its path, and pause while the user edits credentials locally. Stay with the initial import until it succeeds, fails with a precise cause, or requires a user MFA/Keychain action. Do not start duplicate imports.
+
+If the GarminDB install or import cannot complete, preserve the private workspace and report the exact failed stage. Ask whether the user wants to retry, defer GarminDB and continue with manual onboarding, or stop. Never describe an incomplete import as a usable objective baseline.
+
+### 5. Process the Imported GarminDB History
+
+After a verified GarminDB import, read [references/garmindb-bootstrap-analysis.md](references/garmindb-bootstrap-analysis.md) completely and follow it before asking coaching questions or creating a plan.
+
+Take enough time to inspect coverage and process the full imported activity history plus the recovery window relevant to current coaching. Derive supported facts about running frequency, weekly volume and duration, consistency, longest runs, pace and HR patterns, cadence, elevation, activity mix, devices/sensors, and recent recovery. Separate supported facts, estimates, and unavailable fields. Do not infer pain, intent, perceived effort, schedule constraints, or goals from device data.
+
+Persist only the coaching-ready projection described in the bootstrap reference. Keep GarminDB as the complete raw upstream source; do not mirror raw route points, records, laps, or every unreviewed activity into `docs/running_data.db`.
+
+### 6. Collect Only the Remaining Qualitative Baseline
+
+Ask only questions whose answers remain unknown and would materially improve the athlete model or initial plan. Accept “unknown,” “not applicable,” and “prefer not to answer.” Keep each batch short.
+
+For a successful GarminDB import, do not ask the user to restate objective facts already supported by the data, including recent weekly volume or frequency, longest recorded run, recorded pace/HR/cadence patterns, device history, or available activity dates. Instead, summarize what the data appears to show and ask only for correction when a material ambiguity remains.
+
+Normally collect:
 
 - primary running goals and what meaningful growth would look like over the next few months;
-- any confirmed or likely race/event, including date, distance, course context, and finish-versus-performance priority; explicitly record `none` when no event is planned;
-- recent weekly running volume and frequency;
-- longest recent run and any useful recent race, time trial, workout, or benchmark;
-- running history and current consistency;
-- current pain, recurring symptoms, major prior running injuries, or relevant clinician-imposed limits;
-- preferred units and timezone.
+- any confirmed or likely event, including date, distance, course context, and finish-versus-performance priority; explicitly record `none` when no event is planned;
+- current pain, recurring symptoms, major prior running injuries, and relevant clinician-imposed limits;
+- available and preferred run days, long-run day, time constraints, and timezone;
+- typical surface or terrain only when it cannot be established without exposing or reverse-geocoding private routes;
+- strength training, unrecorded cross-training, fueling experience, and equipment constraints not present in the data;
+- perceived easy effort, breathing, and subjective recovery only when those details would change interpretation.
 
-Store each completed current-profile section with `manage_running_data.py set-profile-section`; the command versions the database entry and regenerates `docs/runner_profile.md`. Distinguish facts supplied by the user, estimates, and unknowns. Do not append historical ledgers to the Markdown file.
+When GarminDB was skipped or deferred, also collect the objective baseline manually: recent weekly volume and frequency, longest recent run, running history and consistency, useful races/time trials/workouts, usual easy effort or pace, trustworthy HR/threshold information, and device history.
 
-Then collect operating constraints:
+Store complete current-profile sections with `manage_running_data.py set-profile-section`; the command versions the database entry and regenerates `docs/runner_profile.md`. Distinguish data-supported facts, user reports, estimates, and unknowns. Do not append historical ledgers to Markdown.
 
-- available and preferred run days, long-run day, and time constraints;
-- typical terrain, climate, surfaces, and elevation;
-- usual easy effort or pace and any trustworthy HR/threshold information;
-- strength training and cross-training;
-- watch, HR strap, foot pod, power meter, and available Garmin/Strava history;
-- fueling experience and equipment constraints relevant to the goal.
+### 7. Create the Initial Plan After the Baseline Is Complete
 
-Update the profile again through the database command. Create a provisional plan with `manage_running_data.py upsert-plan`, then store its compact current sections with `set-plan-section`; those commands regenerate `docs/running_plan.md`. Do not require a race date: without an event, create a 4-12 week development block with a named objective and review date; with a confirmed event, add the appropriate event-specific horizon. Mark unresolved items explicitly; do not invent zones, mileage history, benchmark evidence, or races.
+Create a provisional plan only after the imported objective evidence and qualitative answers have both been processed. Use `manage_running_data.py upsert-plan`, then store compact current sections with `set-plan-section`; those commands regenerate `docs/running_plan.md`.
 
-If substantial historical data will be imported, keep the first plan conservative and provisional until that data has been reviewed.
+Do not require a race date. Without an event, create a 4-12 week development block with a named objective and review date; with a confirmed event, add the appropriate event-specific horizon. Mark unresolved items explicitly and do not invent zones, mileage history, benchmark evidence, or races. Keep the first plan conservative and provisional when GarminDB coverage is partial or material qualitative answers remain unknown.
 
-### 5. Complete the GarminDB Branch Only When Selected
-
-Read [references/garmindb-setup.md](references/garmindb-setup.md) completely, then follow it in order.
-
-Do not ask the user to paste a Garmin password, MFA code, token, or configuration contents into chat. Generate the private configuration, show its path, and pause while the user edits credentials locally.
-
-### 6. Explain the Recommended Conversation Structure
+### 8. Explain the Recommended Conversation Structure
 
 Give the user a compact orientation after setup:
 
@@ -124,7 +131,8 @@ Before declaring setup complete:
 - summarize which onboarding fields remain unknown;
 - identify whether the initial plan is absent, provisional, or active;
 - report whether GarminDB was skipped, deferred, configured, or successfully imported;
-- when GarminDB ran, report the installed version, requested data horizon, database location, and any targeted import errors;
+- when GarminDB ran, report the installed version, requested and actual coverage, database location, and any targeted import errors;
+- when GarminDB was processed, report the activity and recovery ranges reviewed, important coverage gaps, which recovery dates and training-summary periods were projected into `docs/running_data.db`, and which profile sections were derived from that evidence;
 - give the exact next conversation the user should start.
 
-Do not treat an incomplete credential step, MFA challenge, failed import, or missing private file as successful initialization.
+Do not treat an incomplete credential step, MFA challenge, failed import, unprocessed GarminDB history, unanswered material qualitative question, or missing private file as successful initialization.
