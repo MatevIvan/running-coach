@@ -14,6 +14,8 @@ All real athlete data lives in `docs/`, which is ignored by Git. This includes:
 
 Only reusable instructions, tooling, and synthetic examples belong in the public repository. Never force-add `docs/` or copy personal values into an example file.
 
+Automatic run-weather lookup sends one representative route coordinate, quantized to a 0.05-degree grid, plus the activity date to the [Open-Meteo Historical Weather API](https://open-meteo.com/en/docs/historical-weather-api). Exact and representative coordinates are not displayed or stored in `running_data.db`. Request an offline/no-weather analysis to skip this network lookup.
+
 Important: `.gitignore` prevents untracked files from being added normally, but it cannot remove data that was already committed. Run a Git status check before every public push, and treat any previously committed personal data as a history-cleanup incident.
 
 ## Repository Layout
@@ -34,7 +36,7 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 │   └── skills/
 │       ├── initialize-running-project/ # Fresh-clone onboarding and optional GarminDB
 │       ├── collect-daily-metrics/    # Daily recovery collection and decisions
-│       ├── analyze-running-activity/ # Completed-run review workflow
+│       ├── analyze-running-activity/ # Run review with historical weather lookup
 │       ├── coach-runner/             # Planning and coaching conversations
 │       ├── research-running-gear/    # Current purchase research
 │       └── parse-fit-run/            # Dependency-free FIT activity parser
@@ -55,7 +57,7 @@ The current roles are:
 
 - `initialize-running-project`: create the ignored private workspace, collect the initial athlete baseline, and optionally install and import GarminDB.
 - `collect-daily-metrics`: record and interpret recovery data.
-- `analyze-running-activity`: review a completed run and decide whether the plan or profile changes.
+- `analyze-running-activity`: review a completed run, retrieve its historical weather, and decide whether the plan or profile changes.
 - `coach-runner`: answer coaching questions and maintain the broader plan and athlete model.
 - `research-running-gear`: research current products against athlete-specific needs.
 - `parse-fit-run`: parse FIT files for the activity-analysis workflow.
@@ -81,7 +83,7 @@ If the private database or current projections do not exist, Codex should report
 
 ## FIT Activity Parsing
 
-The bundled parser extracts record-derived distance, time, pace, HR, cadence, power, splits, HR-zone distribution, and first-half/second-half comparisons from a running FIT file.
+The bundled parser extracts record-derived distance, time, pace, HR, cadence, power, splits, HR-zone distribution, and first-half/second-half comparisons from a running FIT file. During a run review, a companion helper reads GPS points privately, sends only a quantized representative location to the historical-weather service, and never displays or stores route coordinates.
 
 Human-readable output:
 
@@ -102,10 +104,11 @@ The parser uses only Python's standard library.
 For a new run:
 
 1. Ask `analyze-running-activity` to review the run. When GarminDB is connected, it first performs an incremental activity sync; otherwise, add the activity file under `docs/activities/` or provide its details in chat.
-2. Confirm the candidate activity identified by the skill.
-3. Answer its short follow-up about information the device does not know, such as intended purpose, perceived effort, pain or soreness, weather, terrain, and fueling.
-4. The skill parses the FIT file when available, compares the confirmed run with the current private profile and plan, and returns the standard analysis report.
-5. Every analyzed activity is recorded in SQLite. Compact profile or plan projections change only when the new evidence materially changes the athlete model or active schedule.
+2. The skill resolves an unambiguous candidate automatically and asks only when multiple activities plausibly match.
+3. When GPS data is available, the skill derives a privacy-limited route location and retrieves historical temperature, apparent temperature, humidity, dew point, precipitation, wind, and gusts for the activity window.
+4. Answer its short follow-up about information the device and weather archive do not know, such as intended purpose, perceived effort, pain or soreness, surface/footing, unusual localized exposure, and fueling.
+5. The skill parses the FIT file when available, compares the confirmed run and retrieved weather with the current private profile and plan, and returns the standard analysis report.
+6. Every analyzed activity is recorded in SQLite, including the weather provenance when retrieved. Compact profile or plan projections change only when the new evidence materially changes the athlete model or active schedule.
 
 For daily recovery data, provide the current morning's sleep and wearable metrics manually. When GarminDB is connected, `collect-daily-metrics` first syncs through yesterday, confirms yesterday's sleep, and adds yesterday's finalized Body Battery/stress to that prior-date record. It then upserts the recovery date in `docs/running_data.db` and refreshes `docs/recovery_metrics.md`. Day-to-day decisions use the most recent seven valid entries; the rolling Markdown view keeps no more than fourteen.
 
@@ -186,4 +189,24 @@ Training status:
 
 Soreness/pain:
 Illness or unusual fatigue:
+```
+
+## Sample Run Analysis Prompt
+
+```
+Analyze today's run.
+
+Run purpose:
+
+
+Route/terrain:
+
+
+Execution notes:
+Felt easy/moderate/hard:
+Any pain/tightness during run:
+
+Any stops/walk breaks:
+Fuel/hydration used:
+Anything unusual:
 ```

@@ -35,7 +35,7 @@ If the current working directory is not the project root, use the absolute path 
 6. Report missing streams, implausible values, and likely GPS, HR, cadence, or pause artifacts.
 7. Return the parsed record to the calling workflow. Do not update the runner profile or running plan from this parser alone.
 
-The calling analysis skill owns the dated qualitative-question gate. This low-level parser returns objective data only and must not infer pain, effort, weather, session purpose, or physiological meaning.
+The calling analysis skill owns historical-weather retrieval and the dated qualitative-question gate. This low-level parser returns objective activity data only and must not infer pain, effort, session purpose, or physiological meaning. Do not print route coordinates; `analyze-running-activity/scripts/fetch_historical_weather.py` reads GPS points privately and emits only a weather summary.
 
 ## Parser Notes
 
@@ -49,4 +49,5 @@ The calling analysis skill owns the dated qualitative-question gate. This low-le
 
 - Prefer record-derived metrics over screenshots or activity labels when they conflict.
 - Flag impossible GPS, HR, cadence, power, or pace values rather than silently accepting them.
-- Do not infer weather, terrain, symptoms, session purpose, or physiological meaning from the FIT file alone.
+- Do not infer weather from the FIT file alone. Let the calling analysis workflow query historical weather from a privacy-limited representative route point.
+- Do not display, persist, or return route coordinates in parser output.

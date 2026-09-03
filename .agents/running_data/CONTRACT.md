@@ -51,7 +51,14 @@ python3 .agents/scripts/manage_running_data.py --project-root . upsert-recovery 
   "avg_pace_sec_per_km": 360,
   "rpe": 3,
   "outcome": "Concise durable interpretation.",
-  "details": {"sensor_limits": "Optional uncommon audit detail"}
+  "details": {
+    "sensor_limits": "Optional uncommon audit detail",
+    "weather": {
+      "source": "Open-Meteo Historical Weather API",
+      "conditions": "Weather summary returned by fetch_historical_weather.py",
+      "location": {"coordinates_withheld": true}
+    }
+  }
 }
 ```
 

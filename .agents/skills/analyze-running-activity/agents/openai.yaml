@@ -1,4 +1,4 @@
 interface:
   display_name: "Analyze Running Activity"
   short_description: "Sync, confirm, and review a completed run"
-  default_prompt: "Use $analyze-running-activity to sync my latest run when GarminDB is connected, confirm the correct activity with me, collect missing context, and return the analysis report."
+  default_prompt: "Use $analyze-running-activity to sync my latest run when GarminDB is connected, resolve the correct activity, retrieve historical weather from its private GPS data, collect only missing subjective context, and return the analysis report."

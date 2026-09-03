@@ -87,6 +87,10 @@ def list_runs(
                 a.laps AS summary_laps,
                 (SELECT COUNT(*) FROM activity_laps l WHERE l.activity_id = a.activity_id) AS lap_rows,
                 (SELECT COUNT(*) FROM activity_records r WHERE r.activity_id = a.activity_id) AS record_rows,
+                (SELECT COUNT(*) FROM activity_records r
+                 WHERE r.activity_id = a.activity_id
+                   AND r.position_lat IS NOT NULL
+                   AND r.position_long IS NOT NULL) AS gps_record_rows,
                 (SELECT COUNT(*) FROM activity_splits s WHERE s.activity_id = a.activity_id) AS split_rows
             FROM activities a
             WHERE {" AND ".join(conditions)}
@@ -122,6 +126,7 @@ def list_runs(
                     "summary_laps": row["summary_laps"],
                     "lap_rows": row["lap_rows"],
                     "record_rows": row["record_rows"],
+                    "gps_record_rows": row["gps_record_rows"],
                     "split_rows": row["split_rows"],
                 },
                 "fit_file": relative_path(fit_path, root) if fit_path else None,

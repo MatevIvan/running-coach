@@ -108,7 +108,7 @@ Do not ask the user to paste a Garmin password, MFA code, token, or configuratio
 Give the user a compact orientation after setup:
 
 - **Coach chat:** General coaching, weekly reviews, development blocks, plan changes, missed sessions, symptoms affecting future training, race preparation when applicable, and “what should I do next?” Use `coach-runner`.
-- **Run-analysis chat:** Review a completed run from a FIT/GPX file, screenshot, or written metrics. Include purpose, RPE, pain/soreness, weather, terrain, and fueling. Use `analyze-running-activity`.
+- **Run-analysis chat:** Review a completed run from a FIT/GPX file, screenshot, or written metrics. Include purpose, RPE, pain/soreness, terrain/surface, and fueling. When GPS data is available, the skill derives a privacy-limited location and retrieves historical weather automatically. Use `analyze-running-activity`.
 - **Daily-metrics chat:** Manually provide the current morning's sleep and wearable metrics plus fatigue, illness, soreness, and pain. When GarminDB is connected, `collect-daily-metrics` automatically syncs through the prior day, confirms the prior day's sleep, and adds its finalized Body Battery/stress data before interpreting the current morning. This is optional when no daily decision is needed, but useful during heavy training, poor recovery, or symptom monitoring.
 - **Setup/data chat:** Maintain GarminDB, `docs/running_data.db`, imports, privacy checks, and integration failures. Reuse the initialization chat or create a dedicated maintenance chat.
 - **Gear-research chat:** Use `research-running-gear` for purchases that need current product research.
