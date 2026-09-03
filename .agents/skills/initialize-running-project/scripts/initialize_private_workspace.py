@@ -189,6 +189,12 @@ def main() -> int:
         set_private_mode(database, 0o600)
 
     print("Private workspace initialization complete." if not args.dry_run else "Dry run complete.")
+    if os.name == "nt" and not args.dry_run:
+        print(
+            "NOTICE: Windows file permissions are inherited from the containing folder; "
+            "keep docs/ in a private user-owned location and review its ACL if the computer "
+            "or workspace is shared."
+        )
     return 0
 
 

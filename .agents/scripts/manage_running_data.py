@@ -75,7 +75,7 @@ def connect(root: Path, readonly: bool = False) -> sqlite3.Connection:
     if readonly:
         if not path.is_file():
             raise RuntimeError(f"Running database not found: {path}")
-        connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+        connection = sqlite3.connect(f"{path.resolve().as_uri()}?mode=ro", uri=True)
         connection.execute("PRAGMA query_only = ON")
     else:
         path.parent.mkdir(parents=True, exist_ok=True)

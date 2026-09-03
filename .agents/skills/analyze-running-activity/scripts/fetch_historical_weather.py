@@ -20,7 +20,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 API_ENDPOINT = "https://archive-api.open-meteo.com/v1/archive"
@@ -78,7 +78,14 @@ def parse_timestamp(value: str | None, default_timezone: str) -> dt.datetime | N
         return None
     parsed = dt.datetime.fromisoformat(str(value).strip().replace("Z", "+00:00"))
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=ZoneInfo(default_timezone))
+        try:
+            timezone = ZoneInfo(default_timezone)
+        except ZoneInfoNotFoundError as error:
+            raise WeatherLookupError(
+                f"Time zone {default_timezone!r} is unavailable. Install the Python "
+                "tzdata package when the operating system does not provide IANA time zones."
+            ) from error
+        parsed = parsed.replace(tzinfo=timezone)
     return parsed.astimezone(dt.timezone.utc)
 
 
@@ -151,7 +158,7 @@ def load_garmindb_records(
     if not database.is_file():
         raise WeatherLookupError("GarminDB activities database is unavailable.")
     try:
-        connection = sqlite3.connect(f"file:{database}?mode=ro", uri=True)
+        connection = sqlite3.connect(f"{database.resolve().as_uri()}?mode=ro", uri=True)
         connection.row_factory = sqlite3.Row
         columns = {
             row[1] for row in connection.execute("PRAGMA table_info(activity_records)")

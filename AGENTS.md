@@ -16,9 +16,11 @@ Detailed task workflows live in project skills. Keep this file limited to shared
 - Treat `.agents/skills/<skill-name>/SKILL.md` as the canonical definition for each task workflow. Vendor-specific files are discovery adapters only and must not become independent copies of the workflow.
 - When the current harness discovers Agent Skills automatically, invoke the matching skill through that mechanism. Otherwise, use the routing table below, read the matching canonical `SKILL.md` completely, and follow it before taking task-specific action.
 - Map references to filesystem, shell, network, web research, and user-input operations onto the capabilities exposed by the current harness. Request the narrowest necessary authorization before a restricted operation.
+- Detect the host operating system before executing documented commands. In command examples, `python3` means an available Python 3 interpreter; use `py -3` or `python` on Windows when appropriate. Invoke `.py` files through that interpreter, use `.venv/bin/` on macOS/Linux and `.venv\Scripts\` on Windows, and translate POSIX line continuations rather than sending them unchanged to PowerShell.
 - Local data management and parsing workflows require Python and shell execution. If those capabilities are unavailable, do not claim that a command, database write, import, parse, or verification succeeded; provide the exact command for the user to run or report the workflow as blocked.
 - GarminDB synchronization, historical-weather retrieval, dependency installation, and current product research require network access. If the required capability is unavailable, follow the active skill's local-data fallback when one exists and state the limitation precisely. Never present cached or remembered information as a fresh sync or current web research.
 - Keep credentials, permission settings, hooks, and other harness-local configuration under user control. Do not weaken the privacy boundary to make a workflow run in a particular agent.
+- On Windows, do not describe POSIX mode requests such as `0600` or `0700` as effective access control. Keep `docs/` in a private user-owned location, preserve its Git exclusion, and tell the user to review inherited Windows ACLs when the computer or workspace is shared.
 
 ## Privacy Boundary
 

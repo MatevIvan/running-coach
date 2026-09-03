@@ -58,7 +58,7 @@ def list_runs(
     if not db_path.is_file():
         raise FileNotFoundError(f"GarminDB activities database not found: {db_path}")
 
-    connection = sqlite3.connect(f"file:{db_path}?mode=ro", uri=True)
+    connection = sqlite3.connect(f"{db_path.resolve().as_uri()}?mode=ro", uri=True)
     connection.row_factory = sqlite3.Row
     try:
         conditions = ["lower(a.sport) = 'running'"]

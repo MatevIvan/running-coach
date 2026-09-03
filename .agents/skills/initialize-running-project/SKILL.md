@@ -11,6 +11,8 @@ Create a usable private athlete workspace and SQLite record without exposing per
 
 Read `.agents/running_data/CONTRACT.md` before seeding athlete, event, or plan records.
 
+Detect the host operating system before running commands. Use `python3` on macOS/Linux and an available `py -3` or `python` launcher on Windows. Invoke Python scripts through the interpreter; do not rely on Unix shebang execution or copy POSIX line continuations into PowerShell.
+
 ## Required Order
 
 Treat initialization as a gated conversation, not one uninterrupted command sequence.
@@ -36,6 +38,7 @@ Before writing athlete data:
 4. Confirm `.venv/` is ignored when GarminDB was selected.
 5. Add missing ignore rules before creating private content.
 6. Never force-add `docs/`, credentials, tokens, databases, logs, FIT/GPX files, or generated reports.
+7. On Windows, confirm the repository is in a private user-owned location. Explain that the scripts request restrictive POSIX modes where supported but do not replace inherited Windows ACLs; ask the user to review the `docs/` ACL when the machine or workspace is shared.
 
 Stop if `docs/` cannot be kept outside Git.
 
@@ -45,6 +48,12 @@ Run:
 
 ```bash
 python3 .agents/skills/initialize-running-project/scripts/initialize_private_workspace.py --project-root .
+```
+
+Windows PowerShell equivalent:
+
+```powershell
+py -3 .agents\skills\initialize-running-project\scripts\initialize_private_workspace.py --project-root .
 ```
 
 Add `--with-garmindb` only when GarminDB was selected.
@@ -66,6 +75,12 @@ Run the database verifier and do not copy mock values from root example files:
 
 ```bash
 python3 .agents/scripts/manage_running_data.py --project-root . verify
+```
+
+Windows PowerShell equivalent:
+
+```powershell
+py -3 .agents\scripts\manage_running_data.py --project-root . verify
 ```
 
 ### 4. Complete GarminDB Before Coaching Onboarding When Selected

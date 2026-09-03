@@ -15,7 +15,7 @@ import struct
 from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from zoneinfo import ZoneInfo
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 FIT_EPOCH = datetime(1989, 12, 31, tzinfo=timezone.utc)
@@ -431,7 +431,13 @@ def main():
     if len(zone_cutoffs) != 4:
         raise SystemExit("--zones must contain exactly four comma-separated cutoffs")
 
-    tz = ZoneInfo(args.timezone)
+    try:
+        tz = ZoneInfo(args.timezone)
+    except ZoneInfoNotFoundError:
+        parser.error(
+            f"time zone {args.timezone!r} is unavailable; install the Python tzdata "
+            "package when the operating system does not provide IANA time zones"
+        )
     messages = parse_fit(args.fit_file)
     records = normalized_records(messages)
     message_counts = Counter(global_msg for global_msg, _fields in messages)
