@@ -125,7 +125,27 @@ Create a provisional plan only after the imported objective evidence and qualita
 
 Do not require a race date. Without an event, create a 4-12 week development block with a named objective and review date; with a confirmed event, add the appropriate event-specific horizon. Mark unresolved items explicitly and do not invent zones, mileage history, benchmark evidence, or races. Keep the first plan conservative and provisional when GarminDB coverage is partial or material qualitative answers remain unknown.
 
-### 8. Explain the Recommended Conversation Structure
+### 8. Set Up the Optional Local Application
+
+Only after the GarminDB decision and any selected import and processing, qualitative onboarding, and the initial plan are complete, set up the local application. This stage must never delay or invalidate the coaching workspace that was already initialized.
+
+Run:
+
+```bash
+python3 .agents/skills/initialize-running-project/scripts/setup_local_app.py --project-root .
+```
+
+Windows PowerShell equivalent:
+
+```powershell
+py -3 .agents\skills\initialize-running-project\scripts\setup_local_app.py --project-root .
+```
+
+The helper preserves an existing `.venv`, creates one when absent, installs the local Python package, installs the locked frontend dependencies with `npm ci`, builds the frontend, and verifies both halves of the application. It requires Python 3.12+ and Node `^20.19.0 || >=22.12.0`. Never upgrade system Node automatically.
+
+Treat every local-application setup failure as non-blocking. Keep the completed GarminDB and coaching initialization intact, report the UI as deferred, quote the precise failed prerequisite or command from the helper, and tell the user to rerun this step after correcting it. Do not describe the UI as ready unless the helper succeeds and `frontend/dist/index.html` exists.
+
+### 9. Explain the Recommended Conversation Structure
 
 Give the user a compact orientation after setup:
 
@@ -148,6 +168,7 @@ Before declaring setup complete:
 - report whether GarminDB was skipped, deferred, configured, or successfully imported;
 - when GarminDB ran, report the installed version, requested and actual coverage, database location, and any targeted import errors;
 - when GarminDB was processed, report the activity and recovery ranges reviewed, important coverage gaps, which recovery dates and training-summary periods were projected into `docs/running_data.db`, and which profile sections were derived from that evidence;
+- report the local application as ready or deferred; when ready, give `npm start` and `http://127.0.0.1:8000`, and when deferred, give the exact unmet prerequisite or failed command;
 - give the exact next conversation the user should start.
 
 Do not treat an incomplete credential step, MFA challenge, failed import, unprocessed GarminDB history, unanswered material qualitative question, or missing private file as successful initialization.
