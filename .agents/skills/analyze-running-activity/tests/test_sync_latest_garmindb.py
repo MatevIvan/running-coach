@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -41,6 +42,68 @@ class SyncLatestGarminDbTests(unittest.TestCase):
                 handle.write("new failure\n")
 
             self.assertEqual(sync.read_log_delta(log_path, start), "new failure\n")
+
+    def test_network_failures_retry_with_exponential_backoff(self) -> None:
+        outcomes = iter(
+            (
+                subprocess.CompletedProcess([], 1, "Could not resolve host"),
+                subprocess.CompletedProcess([], 1, "Network is unreachable"),
+                subprocess.CompletedProcess([], 0, "sync complete"),
+            )
+        )
+        calls: list[list[str]] = []
+        sleeps: list[float] = []
+
+        def runner(command: list[str], **_: object) -> subprocess.CompletedProcess[str]:
+            calls.append(command)
+            return next(outcomes)
+
+        with tempfile.TemporaryDirectory() as directory:
+            completed, diagnostics, attempts, delays = sync.run_with_network_backoff(
+                ["garmindb"],
+                Path(directory),
+                Path(directory) / "garmindb.log",
+                max_attempts=3,
+                initial_backoff_seconds=0.5,
+                max_backoff_seconds=5.0,
+                runner=runner,
+                sleeper=sleeps.append,
+            )
+
+        self.assertEqual(completed.returncode, 0)
+        self.assertEqual(diagnostics, "sync complete")
+        self.assertEqual(attempts, 3)
+        self.assertEqual(delays, [0.5, 1.0])
+        self.assertEqual(sleeps, [0.5, 1.0])
+        self.assertEqual(len(calls), 3)
+
+    def test_non_network_failure_does_not_retry(self) -> None:
+        sleeps: list[float] = []
+
+        def runner(*_: object, **__: object) -> subprocess.CompletedProcess[str]:
+            return subprocess.CompletedProcess([], 1, "authentication failed")
+
+        with tempfile.TemporaryDirectory() as directory:
+            completed, _, attempts, delays = sync.run_with_network_backoff(
+                ["garmindb"],
+                Path(directory),
+                Path(directory) / "garmindb.log",
+                max_attempts=4,
+                initial_backoff_seconds=1.0,
+                max_backoff_seconds=8.0,
+                runner=runner,
+                sleeper=sleeps.append,
+            )
+
+        self.assertEqual(completed.returncode, 1)
+        self.assertEqual(attempts, 1)
+        self.assertEqual(delays, [])
+        self.assertEqual(sleeps, [])
+
+    def test_backoff_delay_is_capped(self) -> None:
+        self.assertEqual(sync.backoff_delay(1, 2.0, 5.0), 2.0)
+        self.assertEqual(sync.backoff_delay(2, 2.0, 5.0), 4.0)
+        self.assertEqual(sync.backoff_delay(3, 2.0, 5.0), 5.0)
 
 
 if __name__ == "__main__":
