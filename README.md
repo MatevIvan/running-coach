@@ -50,6 +50,39 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 
 The root example files are documentation only. `AGENTS.md` explicitly prohibits treating them as real athlete data.
 
+### Frontend Organization
+
+As the local interface grows, organize `frontend/src/` by feature. Treat this as a target pattern rather than a requirement to create empty directories; add each page, component, and supporting module only when it is needed.
+
+```text
+frontend/src/
+├── app/
+│   ├── App.tsx
+│   └── router.tsx
+├── features/
+│   ├── dashboard/
+│   │   ├── DashboardPage.tsx
+│   │   ├── components/
+│   │   └── DashboardPage.test.tsx
+│   ├── activities/
+│   │   ├── ActivitiesPage.tsx
+│   │   └── components/
+│   ├── recovery/
+│   ├── training-plan/
+│   └── profile/
+├── components/
+│   ├── ui/
+│   └── layout/
+├── api/
+│   ├── client.ts
+│   └── health.ts
+├── hooks/
+├── lib/
+└── index.css
+```
+
+A feature owns its route-level pages and feature-specific components, API code, types, and tests. Put only genuinely reusable interface elements in `components/`, application setup and routing in `app/`, shared backend clients in `api/`, reusable hooks in `hooks/`, and framework-independent helpers in `lib/`.
+
 ## How Agent Instructions Work
 
 `AGENTS.md` is the canonical project constitution. It gives every compatible agent the shared privacy boundary, database and projection contracts, coaching standards, and task-routing rules. The format is an open convention for repository agents; see [AGENTS.md](https://agents.md/).
@@ -109,12 +142,22 @@ Windows does not apply POSIX `0600`/`0700` modes as file ACLs. Keep the reposito
 
 ## Getting Started
 
+Prerequisites are Python 3.12 or newer, npm, and Node `^20.19.0 || >=22.12.0`, as required by [Vite](https://vite.dev/guide/). The initialization can still complete the private coaching workspace when the Node requirement is not yet met; it will report the local application as deferred and will not upgrade Node automatically.
+
 1. Clone the repository.
 2. Open the repository in a supported repository agent.
 3. Ask: `Use the initialize-running-project skill to set up this project for me.` Use `$initialize-running-project` in Codex or `/initialize-running-project` on slash-command surfaces when you prefer explicit invocation.
 4. Choose whether to connect GarminDB. When selected, the agent installs and imports GarminDB, analyzes the available objective history, and only then asks the short qualitative questionnaire.
 5. If GarminDB is selected, edit credentials only in the generated private file when prompted; never paste them into chat.
 6. Put any other Garmin/Strava exports and future FIT/GPX activities under `docs/`.
+
+After initialization reports that the local application is ready, start it from the repository root:
+
+```bash
+npm start
+```
+
+Open `http://127.0.0.1:8000`. To open the default browser automatically, use `npm start -- --open`. Press `Ctrl+C` in the terminal to stop the application. To use another port, run `npm start -- --port PORT` and open the printed URL.
 
 If the private database or current projections do not exist, the agent must report that live athlete data is unavailable. It must never fall back to the synthetic examples.
 

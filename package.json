@@ -1,0 +1,19 @@
+{
+  "name": "privacy-first-running-coach",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "frontend"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "start": "node scripts/run-local-app.mjs",
+    "dev": "node scripts/run-local-app.mjs --dev",
+    "build": "npm run typecheck --workspace frontend && npm run build --workspace frontend",
+    "test": "npm run test:frontend && npm run test:launcher",
+    "test:frontend": "npm run test --workspace frontend",
+    "test:launcher": "node --test tests/node/*.test.mjs"
+  }
+}

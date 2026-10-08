@@ -9,9 +9,15 @@ import os
 import sqlite3
 import subprocess
 import sys
+import time
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Iterator
+from typing import Callable, Iterator
+
+
+DEFAULT_MAX_ATTEMPTS = 3
+DEFAULT_INITIAL_BACKOFF_SECONDS = 2.0
+DEFAULT_MAX_BACKOFF_SECONDS = 30.0
 
 
 def relative_path(path: Path, root: Path) -> str:
@@ -170,6 +176,72 @@ def classify_failure(output: str) -> tuple[str, str]:
     )
 
 
+def backoff_delay(
+    retry_number: int,
+    initial_seconds: float,
+    maximum_seconds: float,
+) -> float:
+    """Return a bounded exponential delay for a one-based retry number."""
+    if retry_number < 1:
+        raise ValueError("retry_number must be at least 1")
+    return min(initial_seconds * (2 ** (retry_number - 1)), maximum_seconds)
+
+
+def run_with_network_backoff(
+    command: list[str],
+    working_dir: Path,
+    log_path: Path,
+    max_attempts: int,
+    initial_backoff_seconds: float,
+    max_backoff_seconds: float,
+    *,
+    runner: Callable[..., subprocess.CompletedProcess[str]] = subprocess.run,
+    sleeper: Callable[[float], None] = time.sleep,
+) -> tuple[subprocess.CompletedProcess[str], str, int, list[float]]:
+    """Run GarminDB, retrying only failures classified as transient network errors."""
+    if max_attempts < 1:
+        raise ValueError("max_attempts must be at least 1")
+    if initial_backoff_seconds <= 0 or max_backoff_seconds <= 0:
+        raise ValueError("backoff delays must be greater than zero")
+
+    retry_delays: list[float] = []
+    for attempt in range(1, max_attempts + 1):
+        log_start = log_size(log_path)
+        completed = runner(
+            command,
+            cwd=working_dir,
+            check=False,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+        diagnostics = "\n".join(
+            part
+            for part in (
+                completed.stdout or "",
+                read_log_delta(log_path, log_start),
+            )
+            if part
+        )
+        failed = completed.returncode != 0 or has_terminal_failure(diagnostics)
+        if not failed:
+            return completed, diagnostics, attempt, retry_delays
+
+        category, _ = classify_failure(diagnostics)
+        if category != "network" or attempt == max_attempts:
+            return completed, diagnostics, attempt, retry_delays
+
+        delay = backoff_delay(
+            retry_number=attempt,
+            initial_seconds=initial_backoff_seconds,
+            maximum_seconds=max_backoff_seconds,
+        )
+        retry_delays.append(delay)
+        sleeper(delay)
+
+    raise AssertionError("GarminDB retry loop exited without a result")
+
+
 @contextmanager
 def sync_lock(lock_path: Path) -> Iterator[None]:
     lock_path.parent.mkdir(parents=True, exist_ok=True)
@@ -230,6 +302,7 @@ def fail(
     as_json: bool,
     exit_code: int,
     log_path: str | None = None,
+    extra: dict[str, object] | None = None,
 ) -> int:
     result: dict[str, object] = {
         "status": status,
@@ -240,6 +313,8 @@ def fail(
     }
     if log_path:
         result["log"] = log_path
+    if extra:
+        result.update(extra)
     emit(result, as_json)
     return exit_code
 
@@ -251,7 +326,32 @@ def main() -> int:
     parser.add_argument("--project-root", type=Path, default=Path.cwd())
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--json", action="store_true")
+    parser.add_argument(
+        "--max-attempts",
+        type=int,
+        default=DEFAULT_MAX_ATTEMPTS,
+        help="Maximum GarminDB attempts for transient network failures (default: 3).",
+    )
+    parser.add_argument(
+        "--initial-backoff-seconds",
+        type=float,
+        default=DEFAULT_INITIAL_BACKOFF_SECONDS,
+        help="Delay before the first network retry (default: 2 seconds).",
+    )
+    parser.add_argument(
+        "--max-backoff-seconds",
+        type=float,
+        default=DEFAULT_MAX_BACKOFF_SECONDS,
+        help="Maximum delay between network retries (default: 30 seconds).",
+    )
     args = parser.parse_args()
+
+    if args.max_attempts < 1:
+        parser.error("--max-attempts must be at least 1")
+    if args.initial_backoff_seconds <= 0:
+        parser.error("--initial-backoff-seconds must be greater than zero")
+    if args.max_backoff_seconds <= 0:
+        parser.error("--max-backoff-seconds must be greater than zero")
 
     root = args.project_root.expanduser().resolve()
     working_dir = root / "docs" / "garmindb"
@@ -302,6 +402,9 @@ def main() -> int:
                 "fresh_data_imported": False,
                 "working_directory": relative_path(working_dir, root),
                 "database": relative_path(db_path, root),
+                "max_attempts": args.max_attempts,
+                "initial_backoff_seconds": args.initial_backoff_seconds,
+                "max_backoff_seconds": args.max_backoff_seconds,
             },
             args.json,
         )
@@ -318,16 +421,15 @@ def main() -> int:
             4,
         )
 
-    log_start = log_size(log_path)
     try:
         with sync_lock(working_dir / ".garmindb_sync.lock"):
-            completed = subprocess.run(
+            completed, diagnostic_output, attempts, retry_delays = run_with_network_backoff(
                 command,
-                cwd=working_dir,
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                text=True,
+                working_dir,
+                log_path,
+                max_attempts=args.max_attempts,
+                initial_backoff_seconds=args.initial_backoff_seconds,
+                max_backoff_seconds=args.max_backoff_seconds,
             )
     except RuntimeError as error:
         return fail("busy", "lock", str(error), args.json, 5)
@@ -341,12 +443,13 @@ def main() -> int:
         )
 
     private_log = relative_path(log_path, root)
-    log_delta = read_log_delta(log_path, log_start)
-    diagnostic_output = "\n".join(
-        part for part in (completed.stdout or "", log_delta) if part
-    )
     if completed.returncode != 0 or has_terminal_failure(diagnostic_output):
         category, message = classify_failure(diagnostic_output)
+        if category == "network" and attempts > 1:
+            message = (
+                f"GarminDB could not reach Garmin Connect after {attempts} attempts; "
+                "no fresh data was imported."
+            )
         return fail(
             "failed",
             category,
@@ -354,6 +457,10 @@ def main() -> int:
             args.json,
             10,
             private_log,
+            {
+                "attempts": attempts,
+                "retry_delays_seconds": retry_delays,
+            },
         )
 
     try:
@@ -391,6 +498,8 @@ def main() -> int:
             "database_verified": True,
             "latest_activity": after,
             "log": private_log,
+            "attempts": attempts,
+            "retry_delays_seconds": retry_delays,
         },
         args.json,
     )

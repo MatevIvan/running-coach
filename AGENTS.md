@@ -71,6 +71,14 @@ Before an athlete-specific workflow analyzes a date or date range:
 
 Use `sqlite3 -readonly` or an equivalent read-only connection. Keep queries date-bounded and avoid broad dumps. Never expose credentials, tokens, route coordinates, or unnecessary health records. GarminDB may not contain every Garmin wearable metric, so label unavailable fields rather than inferring them.
 
+## Local Application Boundary
+
+- The local application is an optional interface and must remain usable without weakening the private-data rules above.
+- Bind application servers only to the loopback address `127.0.0.1`. Do not expose the server to the local network or configure hosted deployment unless the user explicitly expands the scope.
+- The browser frontend may access application data only through explicit same-origin `/api` endpoints. Never give frontend code filesystem paths, credentials, database handles, route coordinates, or direct access to `docs/`.
+- Backend endpoints must expose only the minimum data required by their documented contract. The initial health endpoint must not read athlete files, GarminDB, or `docs/running_data.db`.
+- Treat generated frontend output, dependency directories, caches, coverage, and Python packaging artifacts as local build products; keep them out of Git.
+
 ## Skill Routing
 
 Project skills are specialized prompts and should own task-specific procedures.
