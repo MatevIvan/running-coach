@@ -89,6 +89,7 @@ Project skills are specialized prompts and should own task-specific procedures.
 - Use `coach-runner` for training-plan changes, weekly reviews, development goals, training zones, pacing guidance, mileage or long-run progression, missed sessions, symptoms affecting future training, race preparation or strategy when applicable, or general coaching conversations.
 - Use `research-running-gear` for purchase research or comparisons involving shoes, watches, heart-rate straps, hydration, fueling products, apparel, or other running equipment.
 - Use `parse-fit-run` as the low-level FIT parser. The activity-analysis skill should invoke it when a FIT file is available.
+- Use `develop-running-project` for software engineering work: application features, APIs, database tooling or migrations, scripts, tests, build and setup behavior, repository structure, documentation, and project-skill maintenance.
 
 Skill descriptions can trigger automatically. These routing rules provide a project-level fallback and explain how the skills relate. When a request spans workflows, use the smallest set of relevant skills.
 

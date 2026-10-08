@@ -34,7 +34,8 @@ Important: `.gitignore` prevents untracked files from being added normally, but 
 │       ├── analyze-running-activity/ # Run review with historical weather lookup
 │       ├── coach-runner/             # Planning and coaching conversations
 │       ├── research-running-gear/    # Current purchase research
-│       └── parse-fit-run/            # Dependency-free FIT activity parser
+│       ├── parse-fit-run/            # Dependency-free FIT activity parser
+│       └── develop-running-project/  # Focused software engineering and maintenance
 ├── .gitignore                        # Excludes private data and local settings
 ├── docs/                             # Private local workspace; never committed
 │   ├── runner_profile.md             # Living athlete model
@@ -115,6 +116,7 @@ The current roles are:
 - `coach-runner`: answer coaching questions and maintain the broader plan and athlete model.
 - `research-running-gear`: research current products against athlete-specific needs.
 - `parse-fit-run`: parse FIT files for the activity-analysis workflow.
+- `develop-running-project`: implement, debug, review, and maintain the repository without weakening its privacy or data contracts.
 
 This keeps global context small and loads scenario-specific instructions only when needed.
 
