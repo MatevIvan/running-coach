@@ -2,6 +2,8 @@
 
 `docs/running_data.db` is the durable historical record. The Markdown files under `docs/` are compact current-context projections. Write the database first and regenerate the affected projection with `.agents/scripts/manage_running_data.py`.
 
+After a verified legacy cutover, do not recreate `docs/recovery_metrics_raw.json`; recovery history belongs in SQLite and the generated Markdown projection.
+
 Pass one-off JSON payloads through standard input when a command supports it. If a JSON input file is specifically useful, keep it private under `docs/tmp/` and remove it after a successful write. Distances use meters, durations use seconds, paces use seconds per kilometer, and dates use `YYYY-MM-DD`. Timestamps use ISO 8601.
 
 ## GarminDB Projection Boundary

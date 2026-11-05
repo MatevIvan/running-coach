@@ -16,6 +16,8 @@ Only reusable instructions, tooling, and synthetic examples belong in the public
 
 Automatic run-weather lookup sends one representative route coordinate, quantized to a 0.05-degree grid, plus the activity date to the [Open-Meteo Historical Weather API](https://open-meteo.com/en/docs/historical-weather-api). Exact and representative coordinates are not displayed or stored in `running_data.db`. Request an offline/no-weather analysis to skip this network lookup.
 
+Near-term plan creation may also retrieve a current forecast using only a coarse city or area the athlete has approved for that purpose. Planning never derives a forecast location from GarminDB routes or FIT/GPX coordinates, and transient forecast snapshots are not stored as athlete history.
+
 Important: `.gitignore` prevents untracked files from being added normally, but it cannot remove data that was already committed. Run a Git status check before every public push, and treat any previously committed personal data as a history-cleanup incident.
 
 ## Repository Layout
