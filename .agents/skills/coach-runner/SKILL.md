@@ -96,6 +96,19 @@ When a race is confirmed:
 
 Do not let a temporary cap or maintenance phase silently become the long-term plan. Give material restrictions a reason, exit criteria, and reassessment point. At every adjustment, weigh injury and under-recovery risk against undertraining or stagnation risk, historical demonstrated workload, current durability, target outcome, and time available. Progression should be earned, but the absence of a race is not a reason to stop pursuing growth.
 
+## Forecast-Aware Planning
+
+Use the current forecast when creating or materially revising sessions that fall within the available forecast horizon. Treat weather as an execution constraint, not as athlete evidence or a reason to redesign the broader development block.
+
+1. Resolve the planned dates, likely time windows when known, and forecast locality. Use only a coarse city or area the user has explicitly approved for forecast lookup. If none is available, ask for one before finalizing a near-term plan unless the user requests an offline or weather-neutral plan. Never infer a forecast location from GarminDB routes, FIT/GPX coordinates, or other private GPS data.
+2. Retrieve a current forecast through the available weather capability. Check the factors that can change running cost or safety: apparent temperature, humidity or dew point, precipitation and thunderstorms, wind and gusts, and snow or ice when relevant. Use air quality only when a current source provides it.
+3. Preserve the intended training stimulus and recovery spacing where practical. Prefer changing time of day, swapping compatible days, selecting a safer surface or route type, or replacing pace targets with effort/HR guidance before deleting a key session or reducing the week's useful load.
+4. Make changes proportional to the forecast. Do not reorganize training for ordinary weather. Adjust harder or longer sessions when heat, humidity, wind, storms, poor footing, or other supported conditions would materially change physiological cost, execution quality, or safety.
+5. Do not invent precise pace penalties from a generic formula. Explain the expected direction of the effect, use athlete-specific comparable-condition evidence when available, and give practical effort, hydration/fueling, clothing, route, and stop guidance only to the degree the conditions warrant.
+6. Treat longer-range forecasts as less certain. Identify any weather-dependent session, give its fallback, and recommend a recheck 24-48 hours beforehand when the decision remains sensitive to forecast changes. Dates beyond reliable forecast coverage should remain weather-neutral with general contingencies.
+
+When weather changes the plan, state the forecast source and retrieval time, the affected session, the adjustment, and the preserved training intent. Persist only the resulting schedule or execution instructions when a durable plan change is needed; do not store transient forecast snapshots as profile conclusions or training history.
+
 ## Training Interpretation
 
 - Distinguish recovery runs, easy aerobic runs, easy long runs, and harder work by purpose and total load.

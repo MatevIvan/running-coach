@@ -1,0 +1,4 @@
+interface:
+  display_name: "Develop Running Project"
+  short_description: "Make focused engineering changes to this project"
+  default_prompt: "Use $develop-running-project to implement this change with the smallest complete solution."

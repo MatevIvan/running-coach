@@ -12,13 +12,11 @@ Detailed task workflows live in project skills. Keep this file limited to shared
 
 ## Agent and Harness Compatibility
 
-- Treat this `AGENTS.md` file as the canonical project-wide instruction source.
-- Treat `.agents/skills/<skill-name>/SKILL.md` as the canonical definition for each task workflow. Vendor-specific files are discovery adapters only and must not become independent copies of the workflow.
+- Treat this `AGENTS.md` file as the canonical project-wide instruction source and `.agents/skills/<skill-name>/SKILL.md` as the canonical definition for each task workflow. Vendor-specific files are discovery adapters only.
 - When the current harness discovers Agent Skills automatically, invoke the matching skill through that mechanism. Otherwise, use the routing table below, read the matching canonical `SKILL.md` completely, and follow it before taking task-specific action.
 - Map references to filesystem, shell, network, web research, and user-input operations onto the capabilities exposed by the current harness. Request the narrowest necessary authorization before a restricted operation.
 - Detect the host operating system before executing documented commands. In command examples, `python3` means an available Python 3 interpreter; use `py -3` or `python` on Windows when appropriate. Invoke `.py` files through that interpreter, use `.venv/bin/` on macOS/Linux and `.venv\Scripts\` on Windows, and translate POSIX line continuations rather than sending them unchanged to PowerShell.
-- Local data management and parsing workflows require Python and shell execution. If those capabilities are unavailable, do not claim that a command, database write, import, parse, or verification succeeded; provide the exact command for the user to run or report the workflow as blocked.
-- GarminDB synchronization, historical-weather retrieval, dependency installation, and current product research require network access. If the required capability is unavailable, follow the active skill's local-data fallback when one exists and state the limitation precisely. Never present cached or remembered information as a fresh sync or current web research.
+- Do not claim that a command, database write, import, parse, sync, or verification succeeded unless the required execution or network capability was available and the operation completed. Follow the active skill's fallback when one exists and state the limitation precisely.
 - Keep credentials, permission settings, hooks, and other harness-local configuration under user control. Do not weaken the privacy boundary to make a workflow run in a particular agent.
 - On Windows, do not describe POSIX mode requests such as `0600` or `0700` as effective access control. Keep `docs/` in a private user-owned location, preserve its Git exclusion, and tell the user to review inherited Windows ACLs when the computer or workspace is shared.
 
@@ -41,7 +39,7 @@ Use these generated private Markdown files as compact current-context projection
 - `docs/running_plan.md`: the active operating plan, including `This Week's Plan` and the current development horizon. Completed weeks and superseded adjustments belong in SQLite.
 - `docs/recovery_metrics.md`: the most recent 14 recovery days and current interpretation rules. Older entries and full source detail belong in SQLite.
 
-Use `.agents/scripts/manage_running_data.py` for migrations, current-context reads, date-bounded history, durable writes, verification, and Markdown regeneration. Write SQLite first and regenerate the affected Markdown projection second. Do not recreate `docs/recovery_metrics_raw.json` after the verified legacy cutover.
+Use `.agents/scripts/manage_running_data.py` for migrations, current-context reads, date-bounded history, durable writes, verification, and Markdown regeneration. Write SQLite first and regenerate the affected Markdown projection second.
 
 Raw Garmin/Strava data, FIT/GPX activities, reports, screenshots, and supporting files also belong under `docs/`.
 
@@ -49,27 +47,14 @@ Before using athlete-specific facts, read the relevant compact projection and qu
 
 ## GarminDB Data Source
 
-GarminDB is an optional private objective-data source under `docs/garmindb/`. Its normal locations are:
+GarminDB is an optional private, read-only objective-data source under `docs/garmindb/`. The applicable domain skill owns sync, database selection, weather retrieval, and qualitative follow-up procedures. Across workflows:
 
-- `docs/garmindb/data/DBs/garmin.db`: sleep, resting HR, HRV, daily summary, stress, and weight when enabled.
-- `docs/garmindb/data/DBs/garmin_monitoring.db`: detailed monitoring, HR, HRV, intensity, pulse-ox, and related streams.
-- `docs/garmindb/data/DBs/garmin_activities.db`: activities, laps, records, splits, and sport-specific views.
-- `docs/garmindb/data/DBs/garmin_summary.db`: derived daily, weekly, monthly, and yearly summaries.
-- `docs/garmindb/data/FitFiles/Activities/`: downloaded original activity FIT files.
-
-Before an athlete-specific workflow analyzes a date or date range:
-
-1. Resolve and state the exact date or range being evaluated.
-2. Check whether the relevant GarminDB database exists.
-3. When it exists, query it read-only and confirm that the needed date or range is actually covered. Inspect the live schema before assuming table or column names, because GarminDB versions can differ.
-4. Check coverage per metric or stream. One row does not prove that sleep, HRV, resting HR, Body Battery, stress, activities, laps, and record-level data are all complete.
-5. Extract only the objective fields needed for the task. Prefer an original FIT file for detailed activity analysis when it is available; use GarminDB summaries and records as corroborating or fallback evidence.
-6. If the database or required date is missing or stale, say so. Offer an incremental GarminDB sync or request the missing source; never silently use another date or a root example.
-7. For completed-run analysis, use available FIT, GPX, or GarminDB GPS records to derive a privacy-limited representative location and retrieve historical weather for the activity window. Send only the quantized representative coordinate needed for the lookup; do not display or durably store exact or representative coordinates. Treat retrieved weather as a gridded estimate and report when it is unavailable.
-8. After assembling the objective data, ask only for material qualitative information not already supplied or stored. State the applicable date in the question. Examples include pain or soreness, illness, perceived fatigue, RPE, breathing, intended session purpose, surface/footing, unusual localized exposure, fueling, sleep disruptions, and schedule constraints. Do not routinely ask the user to provide weather when it can be retrieved.
-9. Wait for the qualitative answer before giving the final athlete-specific analysis or changing durable files, unless the user explicitly requested objective extraction only or already supplied the needed context.
-
-Use `sqlite3 -readonly` or an equivalent read-only connection. Keep queries date-bounded and avoid broad dumps. Never expose credentials, tokens, route coordinates, or unnecessary health records. GarminDB may not contain every Garmin wearable metric, so label unavailable fields rather than inferring them.
+- Resolve and state the exact date or range, inspect the live schema, and verify coverage for every metric or stream used.
+- Keep queries date-bounded and extract only the evidence needed for the task. A summary row does not establish detailed or multi-stream coverage.
+- Prefer original activity files for detailed run analysis. If a source is absent, stale, or partial, label the gap and use another source only when its provenance and limitations are clear.
+- Never expose credentials, tokens, route coordinates, or unnecessary health records. Historical activity-weather lookup may send only the quantized representative coordinate defined by the activity-analysis skill. Forecast lookup may use only a coarse city or area the user has approved for that purpose; never derive it from route or GPS data. Do not display or durably store any weather-lookup coordinates.
+- Ask only for material qualitative context not already supplied or stored, label the question with the applicable date or range, and wait for the answer before athlete-specific interpretation or durable writes unless the user requested objective extraction only.
+- Treat unavailable wearable fields and weather as unavailable rather than inferring them.
 
 ## Local Application Boundary
 
@@ -89,13 +74,13 @@ Project skills are specialized prompts and should own task-specific procedures.
 - Use `coach-runner` for training-plan changes, weekly reviews, development goals, training zones, pacing guidance, mileage or long-run progression, missed sessions, symptoms affecting future training, race preparation or strategy when applicable, or general coaching conversations.
 - Use `research-running-gear` for purchase research or comparisons involving shoes, watches, heart-rate straps, hydration, fueling products, apparel, or other running equipment.
 - Use `parse-fit-run` as the low-level FIT parser. The activity-analysis skill should invoke it when a FIT file is available.
+- Use `develop-running-project` for software engineering work: application features, APIs, database tooling or migrations, scripts, tests, build and setup behavior, repository structure, documentation, and project-skill maintenance.
 
 Skill descriptions can trigger automatically. These routing rules provide a project-level fallback and explain how the skills relate. When a request spans workflows, use the smallest set of relevant skills.
 
 ## Shared Operating Rules
 
 - Separate facts supported by data, estimates, planning assumptions, and unknowns when the distinction matters.
-- Prefer original activity files and exports over screenshots, while assessing missing data, sensor reliability, GPS/HR errors, and platform limitations.
 - Treat one run or one recovery reading as an observation unless it materially changes a durable pattern.
 - Do not diagnose medical conditions. Recommend a qualified clinician when symptoms are concerning or persistent.
 - Do not use `pain`, `symptom`, and `injury` interchangeably.
@@ -105,7 +90,7 @@ Skill descriptions can trigger automatically. These routing rules provide a proj
 - When an event is active, treat it as a planning constraint and opportunity for specificity—not permission to override health, compress missed training, or force unsupported targets.
 - Do not let a temporary restriction become the long-term plan without a reason, exit criteria, and reassessment point.
 - Do not make a watch status label or approximate wrist-HR boundary a rigid training decision by itself.
-- Update private durable records only when the active skill's workflow calls for it. Record completed activity analyses and daily recovery observations even when they do not materially change the profile or plan.
+- Update private durable records only when the active skill's workflow calls for it.
 - Preserve older recovery entries, activity reviews, plan adjustments, profile versions, and cumulative training summaries in SQLite. Keep them out of the compact Markdown projections.
 
 ## Communication
